@@ -6,9 +6,11 @@ import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.*;
+import java.util.Base64;
 import java.util.prefs.Preferences;
 
-public class SwingSetup {
+public class SetupKit {
     /** Automatically save & restore size of window from prefs. */
     public static void addWindowRememberer
         (final JFrame frame, Class classForPrefs)
@@ -87,7 +89,65 @@ public class SwingSetup {
 
     public static void init(JFrame frame) {
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        SwingSetup.addWindowRememberer(frame, frame.getClass());
-        SwingSetup.setColors(frame);
+        SetupKit.addWindowRememberer(frame, frame.getClass());
+        SetupKit.setColors(frame);
+    }
+
+    public static Object deserialize(byte[] buf) throws IOException, ClassNotFoundException {
+        ObjectInputStream in = new ObjectInputStream(new ByteArrayInputStream(buf));
+        return in.readObject();
+    }
+
+    /** Deserialize an object, but if there are exceptions, print them and return null. */
+    public static Object deserializePrintExceptions(byte[] buf) {
+        try {
+            return deserialize(buf);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public static byte[] serializePrintExceptions(Object o) {
+        try {
+            return serialize(o);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public static byte[] serialize(Object o) throws IOException {
+        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+        ObjectOutputStream out = new ObjectOutputStream(bytes);
+        out.writeObject(o);
+        out.close();
+        return bytes.toByteArray();
+    }
+
+    public static void savePref(Class clz, String key, Serializable value) {
+        Preferences prefs = Preferences.userNodeForPackage(clz);
+        if (value == null)
+            prefs.remove(key);
+        else {
+            byte[] raw = serializePrintExceptions(value);
+            // if this returns null, maybe remove the pref
+            if (raw != null)
+                prefs.putByteArray(key, Base64.getMimeEncoder().encode(raw));
+        }
+    }
+
+    public static Object loadPref(Class clz, String key) {
+        Preferences prefs = Preferences.userNodeForPackage(clz);
+        byte[] encoded64 = prefs.getByteArray(key, null);
+        if (encoded64 == null)
+            return null;
+        else {
+            byte[] decoded = Base64.getMimeDecoder().decode(encoded64);
+            return deserializePrintExceptions(decoded); // if this returns null maybe erase the pref
+        }
     }
 }
