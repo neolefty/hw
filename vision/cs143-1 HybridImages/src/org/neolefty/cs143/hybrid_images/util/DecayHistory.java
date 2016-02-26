@@ -6,6 +6,7 @@ import com.google.common.collect.TreeMultimap;
 import java.io.*;
 import java.util.*;
 
+// TODO send change events via JavaFX's way
 /** An exponentially decaying history. Good for files?
  *  When you add an item, all current weights decay, and the new item's weight is increased by 1. */
 public class DecayHistory<T extends Comparable & Serializable> implements Externalizable {
