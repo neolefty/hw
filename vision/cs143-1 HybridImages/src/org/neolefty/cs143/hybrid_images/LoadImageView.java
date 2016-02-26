@@ -22,6 +22,9 @@ public class LoadImageView extends StackPane {
     private DecayHistory<String> fileHistory;
 
     public LoadImageView(Class prefsClass, String prefsKey) {
+//        setPrefHeight(100);
+//        setPrefWidth(100);
+
         this.prefsClass = prefsClass;
         this.prefsKey = prefsKey;
         //noinspection unchecked
@@ -36,6 +39,7 @@ public class LoadImageView extends StackPane {
         controls.getChildren().add(chooseButton);
 
         imageView = new BufferedImageView();
+        imageView.setPreserveRatio(true);
         imageView.fitWidthProperty().bind(widthProperty());
         imageView.fitHeightProperty().bind(heightProperty());
 
