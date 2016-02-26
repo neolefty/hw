@@ -1,0 +1,26 @@
+apply plugin: 'java'
+apply plugin: 'idea'
+apply plugin: 'application'
+
+mainClassName = 'org.neolefty.cs143.hybrid_images.Main'
+
+sourceSets {
+    main {
+	java {
+	    srcDir 'src'
+	}
+	resources {
+	    srcDir 'data'
+	}
+    }
+}
+
+repositories {
+  mavenCentral()
+}
+
+dependencies {
+    // compile group: 'com.google.guava', name: 'guava', version: '19.0'
+    compile 'com.google.guava:guava:19.0'
+}
+
