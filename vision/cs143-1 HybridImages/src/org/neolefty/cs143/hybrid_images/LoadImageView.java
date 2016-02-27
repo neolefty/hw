@@ -18,18 +18,20 @@ import java.io.IOException;
 /** Loads a BufferedImage interactively. */
 public class LoadImageView extends StackPane {
     private Class prefsClass;
-    private String prefsKey;
+    private String prefsFileHistoryKey;
     private BufferedImageView imageView;
     private DecayHistory<String> fileHistory;
 
-    public LoadImageView(Class prefsClass, String prefsKey) {
+    private static final String PREFS_FILE_HISTORY = "file_history";
+
+    public LoadImageView(Class prefsClass, String prefsSuffix) {
 //        setPrefHeight(100);
 //        setPrefWidth(100);
 
         this.prefsClass = prefsClass;
-        this.prefsKey = prefsKey;
+        this.prefsFileHistoryKey = PREFS_FILE_HISTORY + "_" + prefsSuffix;
         //noinspection unchecked
-        fileHistory = (DecayHistory<String>) SetupKit.loadPref(prefsClass, prefsKey);
+        fileHistory = (DecayHistory<String>) SetupKit.loadPref(prefsClass, prefsFileHistoryKey);
         if (fileHistory == null)
             fileHistory = new DecayHistory<>();
 
@@ -81,12 +83,13 @@ public class LoadImageView extends StackPane {
         if (topDir != null && topDir.exists())
             chooser.setInitialDirectory(topDir);
         File file = chooser.showOpenDialog(getScene().getWindow());
-        try {
-            fileHistory.add(file.getCanonicalPath());
-            SetupKit.savePref(prefsClass, prefsKey, fileHistory);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        if (file != null)
+            try {
+                fileHistory.add(file.getCanonicalPath());
+                SetupKit.savePref(prefsClass, prefsFileHistoryKey, fileHistory);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         return file;
     }
 
