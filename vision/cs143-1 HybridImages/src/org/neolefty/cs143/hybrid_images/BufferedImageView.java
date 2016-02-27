@@ -15,6 +15,7 @@ public class BufferedImageView extends ImageView {
         imageProperty.addListener((observable, oldValue, newValue) -> {
             setImage(SwingFXUtils.toFXImage(newValue, null));
         });
+        super.setSmooth(true); // better quality scaling
     }
 
 //    public void setBufferedImage(BufferedImage image) {
