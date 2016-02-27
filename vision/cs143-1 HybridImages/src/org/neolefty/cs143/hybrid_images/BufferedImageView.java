@@ -1,5 +1,7 @@
 package org.neolefty.cs143.hybrid_images;
 
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.image.ImageView;
 
@@ -7,12 +9,23 @@ import java.awt.image.BufferedImage;
 
 /** View a BufferedImage in JavaFX. */
 public class BufferedImageView extends ImageView {
-    public void setImage(BufferedImage image) {
-//        double imgH = image.getHeight(), imgW = image.getWidth();
-//        setScaleX(300. / imgW);
-//        setScaleY(300. / imgH);
-//        setTranslateX((300-imgW)/2);
-//        setTranslateY((300-imgH)/2);
-        setImage(SwingFXUtils.toFXImage(image, null));
+    private ObjectProperty<BufferedImage> imageProperty = new SimpleObjectProperty<>();
+
+    public BufferedImageView() {
+        imageProperty.addListener((observable, oldValue, newValue) -> {
+            setImage(SwingFXUtils.toFXImage(newValue, null));
+        });
+    }
+
+//    public void setBufferedImage(BufferedImage image) {
+//        imageProperty.setValue(image);
+//    }
+//
+//    public BufferedImage getBufferedImage() {
+//        return imageProperty.get();
+//    }
+
+    public ObjectProperty<BufferedImage> bufferedImageProperty() {
+        return imageProperty;
     }
 }

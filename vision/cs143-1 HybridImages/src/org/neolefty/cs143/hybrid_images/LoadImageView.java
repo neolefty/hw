@@ -1,6 +1,7 @@
 package org.neolefty.cs143.hybrid_images;
 
 import javafx.application.Platform;
+import javafx.beans.property.ObjectProperty;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.layout.FlowPane;
@@ -54,6 +55,10 @@ public class LoadImageView extends StackPane {
         });
     }
 
+    public ObjectProperty<BufferedImage> bufferedImageProperty() {
+        return imageView.bufferedImageProperty();
+    }
+
     private File topFile() {
         String topName = fileHistory.getTop();
         return topName == null ? null : new File(topName);
@@ -88,14 +93,9 @@ public class LoadImageView extends StackPane {
     private void setImageFile(File file) {
         try {
             BufferedImage image = ImageIOKit.loadImage(file);
-            setImage(image);
+            bufferedImageProperty().setValue(image);
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
-
-    private void setImage(BufferedImage image) {
-        if (imageView != null)
-            imageView.setImage(image);
     }
 }
