@@ -1,7 +1,10 @@
 package org.neolefty.cs143.hybrid_images.ui.util;
 
 import javafx.beans.property.ObjectProperty;
-import org.neolefty.cs143.hybrid_images.ProcessedImage;
+import org.neolefty.cs143.hybrid_images.ImageProcessor;
+import org.neolefty.cs143.hybrid_images.img.IntToIntFunction;
+import org.neolefty.cs143.hybrid_images.img.PixelProcessor;
+import org.neolefty.cs143.hybrid_images.img.ThreadedPixelProcessor;
 import org.neolefty.cs143.hybrid_images.ui.HasBufferedImageProperty;
 import org.neolefty.cs143.hybrid_images.ui.StackImageView;
 
@@ -11,7 +14,7 @@ import java.util.concurrent.Executors;
 
 /** Display a processed image. */
 public class ProcessedImageView extends StackImageView {
-    public ProcessedImageView(ProcessedImage processor,
+    public ProcessedImageView(ImageProcessor processor,
                               ObjectProperty<BufferedImage> source, ExecutorService executorService)
     {
         if (executorService == null)
@@ -21,8 +24,20 @@ public class ProcessedImageView extends StackImageView {
                 ex.submit(() -> setImage(processor.process(newValue))));
     }
 
-    public ProcessedImageView(ProcessedImage processor,
+    public ProcessedImageView(ImageProcessor processor,
                               HasBufferedImageProperty source, ExecutorService executorService) {
         this(processor, source.bufferedImageProperty(), executorService);
+    }
+
+    public ProcessedImageView(IntToIntFunction pixelFunction,
+                              HasBufferedImageProperty source, ExecutorService executorService)
+    {
+        this(new PixelProcessor(pixelFunction), source, executorService);
+    }
+
+    public ProcessedImageView(IntToIntFunction pixelFunction, int n,
+                              HasBufferedImageProperty source, ExecutorService executorService)
+    {
+        this(new ThreadedPixelProcessor(pixelFunction, n), source, executorService);
     }
 }

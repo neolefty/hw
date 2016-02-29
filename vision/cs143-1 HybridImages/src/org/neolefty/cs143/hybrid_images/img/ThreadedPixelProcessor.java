@@ -4,10 +4,29 @@ import org.neolefty.cs143.hybrid_images.util.Stopwatch;
 
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
-// TODO try multithreading pixel processing
-/** Process one pixel at a time. */
-public abstract class FasterPixelProcessor extends PixelProcessor {
+/** Multithreaded pixel processor. */
+public class ThreadedPixelProcessor extends PixelProcessor {
+    private ExecutorService threadPool;
+    private int nPieces;
+
+    public ThreadedPixelProcessor(IntToIntFunction pixelFunction) {
+        this(pixelFunction, Runtime.getRuntime().availableProcessors());
+    }
+
+    public ThreadedPixelProcessor(IntToIntFunction pixelFunction, int n) {
+        this(pixelFunction, Executors.newCachedThreadPool(), n);
+    }
+
+    public ThreadedPixelProcessor(IntToIntFunction pixelFunction, ExecutorService executorService, int nPieces) {
+        super(pixelFunction);
+        this.threadPool = executorService;
+        this.nPieces = nPieces;
+    }
+
     @Override
     public BufferedImage process(BufferedImage original) {
         if (original == null)
@@ -36,8 +55,20 @@ public abstract class FasterPixelProcessor extends PixelProcessor {
 //            watch.mark("output array"); // always 0
 
             // do the processing
-            for (int i = 0; i < in.length; ++i)
-                out[i] = process(in[i]);
+            int chunk = in.length / nPieces;
+            CountDownLatch latch = new CountDownLatch(nPieces);
+            for (int i = 0; i < nPieces; ++i) {
+                // from a to b-1; ensure that we go right up to the end
+                final int a = i * chunk, b = (i == nPieces - 1 ? in.length : a + chunk);
+                threadPool.submit(() -> {
+                    for (int j = a; j < b; ++j)
+                        out[j] = getPixelFunction().apply(in[j]);
+                    latch.countDown();
+                });
+            }
+
+            try { latch.await(); } catch (InterruptedException e) { e.printStackTrace(); }
+
             watch.mark("process");
             copyOrig.flush();
 
@@ -50,9 +81,14 @@ public abstract class FasterPixelProcessor extends PixelProcessor {
             result.flush();
             watch.mark("copy");
 
-            System.out.println(getName() + ": " + (w * h) + " pixels -- " + watch
-                     + " -- " + (1000000 * watch.getElapsed() / (w * h)) + " ns per pixel");
+            System.out.println(getName() + " - " + (w * h) + " pixels - " + watch
+                     + " -- " + (1000000 * watch.getElapsed() / (w * h)) + " ns per pixel - " + getName());
             return accel;
         }
+    }
+
+    @Override
+    public String getName() {
+        return super.getName() + "-" + nPieces;
     }
 }

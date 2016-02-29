@@ -9,12 +9,12 @@ import javafx.beans.property.SimpleObjectProperty;
 import java.awt.image.BufferedImage;
 
 /** Processed image -- alters an incoming image. */
-public abstract class ProcessedImage {
+public abstract class ImageProcessor {
     private ReadOnlyObjectWrapper<BufferedImage> processedImage;
 //    private ReadOnlyObjectProperty<BufferedImage> processedImage;
     private SimpleObjectProperty<BufferedImage> unprocessedImage = new SimpleObjectProperty<>();
 
-    public ProcessedImage() {
+    public ImageProcessor() {
         processedImage = new ReadOnlyObjectWrapper<>();
 //        processedImage = new ReadOnlyObjectWrapper<BufferedImage>() {
 //            private BufferedImage processedImage = null;

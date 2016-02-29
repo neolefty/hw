@@ -4,8 +4,6 @@ import javafx.application.Application;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 import org.neolefty.cs143.hybrid_images.img.Dimmer;
-import org.neolefty.cs143.hybrid_images.img.InvertBlue;
-import org.neolefty.cs143.hybrid_images.img.RotateGBR;
 import org.neolefty.cs143.hybrid_images.ui.LoadImageView;
 import org.neolefty.cs143.hybrid_images.ui.PersistentScene;
 import org.neolefty.cs143.hybrid_images.ui.StackImageView;
@@ -16,7 +14,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class Main extends Application {
-    private ExecutorService threadPool = Executors.newFixedThreadPool(3);
+//    private ExecutorService threadPool = Executors.newFixedThreadPool(3);
+    private ExecutorService threadPool = Executors.newSingleThreadExecutor();
 
     public static void main(String[] args) {
         launch(args);
@@ -29,9 +28,11 @@ public class Main extends Application {
         LoadImageView mid = new LoadImageView(getClass(), "mid");
         LoadImageView right = new LoadImageView(getClass(), "right");
 
-        StackImageView left2 = new ProcessedImageView(new InvertBlue(), left, threadPool);
-        StackImageView mid2 = new ProcessedImageView(new Dimmer(), mid, threadPool);
-        StackImageView right2 = new ProcessedImageView(new RotateGBR(), right, threadPool);
+//        StackImageView left2 = new ProcessedImageView(new InvertBlue(), left, threadPool);
+        StackImageView left2 = new ProcessedImageView(new Dimmer(), mid, threadPool);
+        StackImageView mid2 = new ProcessedImageView(new Dimmer(), 4, mid, threadPool);
+        StackImageView right2 = new ProcessedImageView(new Dimmer(), 8, mid, threadPool);
+//        StackImageView right2 = new ProcessedImageView(new RotateGBR(), right, threadPool);
 
         // TODO figure out how to make binding work
 //        blue.unprocessedImageProperty().bind(left.bufferedImageProperty());
