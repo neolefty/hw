@@ -4,6 +4,8 @@ import javafx.application.Application;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 import org.neolefty.cs143.hybrid_images.img.Dimmer;
+import org.neolefty.cs143.hybrid_images.img.InvertBlue;
+import org.neolefty.cs143.hybrid_images.img.RotateGBR;
 import org.neolefty.cs143.hybrid_images.ui.LoadImageView;
 import org.neolefty.cs143.hybrid_images.ui.PersistentScene;
 import org.neolefty.cs143.hybrid_images.ui.StackImageView;
@@ -28,11 +30,11 @@ public class Main extends Application {
         LoadImageView mid = new LoadImageView(getClass(), "mid");
         LoadImageView right = new LoadImageView(getClass(), "right");
 
-//        StackImageView left2 = new ProcessedImageView(new InvertBlue(), left, threadPool);
-        StackImageView left2 = new ProcessedImageView(new Dimmer(), mid, threadPool);
-        StackImageView mid2 = new ProcessedImageView(new Dimmer(), 4, mid, threadPool);
-        StackImageView right2 = new ProcessedImageView(new Dimmer(), 8, mid, threadPool);
-//        StackImageView right2 = new ProcessedImageView(new RotateGBR(), right, threadPool);
+        StackImageView left2 = new ProcessedImageView(new InvertBlue(), left, threadPool);
+//        StackImageView left2 = new ProcessedImageView(new Dimmer(), mid, threadPool);
+        StackImageView mid2 = new ProcessedImageView(new Dimmer(), mid, threadPool);
+//        StackImageView right2 = new ProcessedImageView(new Dimmer(), mid, threadPool);
+        StackImageView right2 = new ProcessedImageView(new RotateGBR(), right, threadPool);
 
         // TODO figure out how to make binding work
 //        blue.unprocessedImageProperty().bind(left.bufferedImageProperty());
@@ -49,7 +51,9 @@ public class Main extends Application {
         outer.add(mid2, 1, 1);
         outer.add(right2, 2, 1);
 
-        primaryStage.setScene(new PersistentScene(getClass(), outer, 600, 250));
+        PersistentScene scene = new PersistentScene(getClass(), outer, 600, 250);
+        scene.setExitOnClose(true);
+        primaryStage.setScene(scene);
         primaryStage.show();
     }
 }

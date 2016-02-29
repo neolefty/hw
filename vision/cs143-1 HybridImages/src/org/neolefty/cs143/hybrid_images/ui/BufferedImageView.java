@@ -13,7 +13,7 @@ public class BufferedImageView extends ImageView {
     private ObjectProperty<BufferedImage> imageProperty = new SimpleObjectProperty<>();
 
     public BufferedImageView() {
-//        super.setSmooth(true); // better quality scaling
+        super.setSmooth(true); // better quality scaling
         imageProperty.addListener((observable, oldValue, newValue) -> {
             Platform.runLater(() -> {
 //                GraphicsEnvironment env = GraphicsEnvironment.getLocalGraphicsEnvironment();

@@ -3,7 +3,6 @@ package org.neolefty.cs143.hybrid_images.ui.util;
 import javafx.beans.property.ObjectProperty;
 import org.neolefty.cs143.hybrid_images.ImageProcessor;
 import org.neolefty.cs143.hybrid_images.img.IntToIntFunction;
-import org.neolefty.cs143.hybrid_images.img.PixelProcessor;
 import org.neolefty.cs143.hybrid_images.img.ThreadedPixelProcessor;
 import org.neolefty.cs143.hybrid_images.ui.HasBufferedImageProperty;
 import org.neolefty.cs143.hybrid_images.ui.StackImageView;
@@ -32,7 +31,7 @@ public class ProcessedImageView extends StackImageView {
     public ProcessedImageView(IntToIntFunction pixelFunction,
                               HasBufferedImageProperty source, ExecutorService executorService)
     {
-        this(new PixelProcessor(pixelFunction), source, executorService);
+        this(new ThreadedPixelProcessor(pixelFunction), source, executorService);
     }
 
     public ProcessedImageView(IntToIntFunction pixelFunction, int n,
