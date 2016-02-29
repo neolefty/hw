@@ -1,4 +1,4 @@
-package org.neolefty.cs143.hybrid_images.ui;
+package org.neolefty.cs143.hybrid_images.ui.util;
 
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Region;

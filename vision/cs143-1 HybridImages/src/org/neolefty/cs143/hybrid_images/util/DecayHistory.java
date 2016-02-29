@@ -2,6 +2,7 @@ package org.neolefty.cs143.hybrid_images.util;
 
 import com.google.common.collect.Ordering;
 import com.google.common.collect.TreeMultimap;
+import org.neolefty.cs143.hybrid_images.test.TestKit;
 
 import java.io.*;
 import java.util.*;

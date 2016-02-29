@@ -1,4 +1,4 @@
-package org.neolefty.cs143.hybrid_images.util;
+package org.neolefty.cs143.hybrid_images.test;
 
 public class TestKit {
     public static void checkAssert() {

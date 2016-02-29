@@ -1,4 +1,4 @@
-package org.neolefty.cs143.hybrid_images.util;
+package org.neolefty.cs143.hybrid_images.ui.util;
 
 import java.awt.*;
 

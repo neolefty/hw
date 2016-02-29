@@ -1,5 +1,6 @@
 package org.neolefty.cs143.hybrid_images.ui;
 
+import javafx.application.Platform;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.embed.swing.SwingFXUtils;
@@ -12,19 +13,18 @@ public class BufferedImageView extends ImageView {
     private ObjectProperty<BufferedImage> imageProperty = new SimpleObjectProperty<>();
 
     public BufferedImageView() {
+//        super.setSmooth(true); // better quality scaling
         imageProperty.addListener((observable, oldValue, newValue) -> {
-            setImage(SwingFXUtils.toFXImage(newValue, null));
+            Platform.runLater(() -> {
+//                GraphicsEnvironment env = GraphicsEnvironment.getLocalGraphicsEnvironment();
+//                GraphicsDevice device = env.getDefaultScreenDevice();
+//                GraphicsConfiguration conf = device.getDefaultConfiguration();
+//                ImageCapabilities cap = newValue.getCapabilities(conf);
+//                System.out.println("Accelerated? " + cap.isAccelerated() + " volatile? " + cap.isTrueVolatile());
+                setImage(SwingFXUtils.toFXImage(newValue, null));
+            });
         });
-        super.setSmooth(true); // better quality scaling
     }
-
-//    public void setBufferedImage(BufferedImage image) {
-//        imageProperty.setValue(image);
-//    }
-//
-//    public BufferedImage getBufferedImage() {
-//        return imageProperty.get();
-//    }
 
     public ObjectProperty<BufferedImage> bufferedImageProperty() {
         return imageProperty;

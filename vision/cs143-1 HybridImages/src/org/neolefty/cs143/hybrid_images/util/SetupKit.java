@@ -1,5 +1,7 @@
 package org.neolefty.cs143.hybrid_images.util;
 
+import org.neolefty.cs143.hybrid_images.ui.util.UIConstants;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ComponentAdapter;
