@@ -7,7 +7,7 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import org.neolefty.cs143.hybrid_images.test.ui.CirclePane;
-import org.neolefty.cs143.hybrid_images.ui.PersistentScene;
+import org.neolefty.cs143.hybrid_images.ui.util.PersistentScene;
 import org.neolefty.cs143.hybrid_images.test.ui.StretchOval;
 import org.neolefty.cs143.hybrid_images.ui.util.StrictGrid;
 

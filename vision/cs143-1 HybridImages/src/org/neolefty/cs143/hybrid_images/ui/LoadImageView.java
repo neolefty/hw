@@ -18,6 +18,7 @@ public class LoadImageView extends StackImageView {
     private Class prefsClass;
     private String prefsFileHistoryKey;
     private DecayHistory<String> fileHistory;
+    private File curFile;
     private static ExecutorService diskAccessThreadPool = Executors.newSingleThreadExecutor();
 
     private static final String PREFS_FILE_HISTORY = "file_history";
@@ -39,34 +40,45 @@ public class LoadImageView extends StackImageView {
         getChildren().add(controls);
 
         // load the previous image by default
-        File topFile = topFile();
+        File topFile = getMostRecentFile();
         if (topFile != null && topFile.exists())
             loadImage(topFile);
     }
 
-
-    private File topFile() {
-        String topName = fileHistory.getTop();
-        return topName == null ? null : new File(topName);
+    /** Either the current file or the top one in the history. */
+    private File getMostRecentFile() {
+        if (curFile != null)
+            return curFile;
+        else {
+            String topName = fileHistory.getTop();
+            return topName == null ? null : new File(topName);
+        }
     }
 
-    private File topDir() {
-        File topFile = topFile();
+    /** Either the current file's directory or the top one in history. */
+    private File getMostRecentDir() {
+        File topFile = getMostRecentFile();
         return topFile == null ? null : topFile.getParentFile();
     }
 
+    /** Interactively choose and display a file. */
     private void loadImageInteractive() {
         File file = chooseFile();
-        if (file != null)
+        if (file != null) // Cancel --> null
             loadImage(file);
     }
 
+    /** Interactively choose a file. */
     private File chooseFile() {
         FileChooser chooser = new FileChooser();
-        File topDir = topDir();
+        File topDir = getMostRecentDir();
         if (topDir != null && topDir.exists())
             chooser.setInitialDirectory(topDir);
-        File file = chooser.showOpenDialog(getScene().getWindow());
+        return chooser.showOpenDialog(getScene().getWindow());
+    }
+
+    /** Store a file in the history. */
+    private void rememberFile(File file) {
         if (file != null)
             try {
                 fileHistory.add(file.getCanonicalPath());
@@ -74,14 +86,16 @@ public class LoadImageView extends StackImageView {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-        return file;
     }
 
+    /** Load and display an image. */
     private void loadImage(File file) {
         // load from file in a worker thread
         diskAccessThreadPool.submit(() -> {
             try {
                 setImage(ImageIOKit.loadImage(file));
+                this.curFile = file;
+                rememberFile(file);
             } catch (IOException e) {
                 e.printStackTrace();
             }

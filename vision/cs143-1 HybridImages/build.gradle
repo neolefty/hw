@@ -6,21 +6,22 @@ mainClassName = 'org.neolefty.cs143.hybrid_images.Main'
 
 sourceSets {
     main {
-	java {
-	    srcDir 'src'
-	}
-	resources {
-	    srcDir 'data'
-	}
+    	java {
+	        srcDir 'src'
+	    }
+        resources {
+            srcDir 'data'
+        }
     }
 }
 
 repositories {
-  mavenCentral()
+    mavenCentral()
 }
 
 dependencies {
     // compile group: 'com.google.guava', name: 'guava', version: '19.0'
     compile 'com.google.guava:guava:19.0'
+	compile 'org.boofcv:all:0.21'
 }
 

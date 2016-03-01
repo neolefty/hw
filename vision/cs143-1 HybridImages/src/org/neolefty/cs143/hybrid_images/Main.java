@@ -7,7 +7,7 @@ import org.neolefty.cs143.hybrid_images.img.Dimmer;
 import org.neolefty.cs143.hybrid_images.img.InvertBlue;
 import org.neolefty.cs143.hybrid_images.img.RotateGBR;
 import org.neolefty.cs143.hybrid_images.ui.LoadImageView;
-import org.neolefty.cs143.hybrid_images.ui.PersistentScene;
+import org.neolefty.cs143.hybrid_images.ui.util.PersistentScene;
 import org.neolefty.cs143.hybrid_images.ui.StackImageView;
 import org.neolefty.cs143.hybrid_images.ui.util.ProcessedImageView;
 import org.neolefty.cs143.hybrid_images.ui.util.StrictGrid;

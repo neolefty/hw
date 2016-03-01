@@ -34,9 +34,9 @@ public class ProcessedImageView extends StackImageView {
         this(new ThreadedPixelProcessor(pixelFunction), source, executorService);
     }
 
-    public ProcessedImageView(IntToIntFunction pixelFunction, int n,
-                              HasBufferedImageProperty source, ExecutorService executorService)
-    {
-        this(new ThreadedPixelProcessor(pixelFunction, n), source, executorService);
-    }
+//    public ProcessedImageView(IntToIntFunction pixelFunction, int n,
+//                              HasBufferedImageProperty source, ExecutorService executorService)
+//    {
+//        this(new ThreadedPixelProcessor(pixelFunction, n), source, executorService);
+//    }
 }
