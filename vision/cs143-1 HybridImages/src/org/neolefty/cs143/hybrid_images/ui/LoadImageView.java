@@ -91,6 +91,10 @@ public class LoadImageView extends StackImageView {
             }
     }
 
+    private void loadImage(Shortener shortener) {
+        loadImage(shortener.getVerbose());
+    }
+
     private void loadImage(String filename) {
         loadImage(new File(filename));
     }
