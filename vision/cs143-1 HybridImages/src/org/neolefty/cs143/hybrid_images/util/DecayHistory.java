@@ -6,11 +6,15 @@ import org.neolefty.cs143.hybrid_images.test.TestKit;
 
 import java.io.*;
 import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicInteger;
 
 // TODO send change events via JavaFX's way
 /** An exponentially decaying history. Good for files?
  *  When you add an item, all current weights decay, and the new item's weight is increased by 1. */
 public class DecayHistory<T extends Comparable & Serializable> implements Externalizable {
+    private static final long serialVersionUID = -6800609000471233355L;
     private static final int VERSION = 1;
     private static final double DECAY = 0.9;
 
@@ -29,6 +33,24 @@ public class DecayHistory<T extends Comparable & Serializable> implements Extern
     /** A list of values in weighted order, heaviest first. */
     public List<T> values() {
         return new ArrayList<>(weightMap.values());
+    }
+
+    // TODO extract into helper or super class, or maybe just use ObjectWrapper
+    public interface Listener { void changed(DecayHistory h); }
+    private Set<Listener> listeners = new HashSet<>();
+    /** Listen for changes to this. */
+    public void addListener(Listener listener) { listeners.add(listener); }
+    /** Stop listening for changes to this. */
+    public void removeListener(Listener listener) { listeners.remove(listener); }
+    private AtomicInteger inQueue = new AtomicInteger(0);
+    private ExecutorService listenerThread = Executors.newSingleThreadExecutor();
+    private void notifyListeners() {
+        if (inQueue.get() <= 2) // avoid thrashing by having at most one full round of notifications queued
+            listenerThread.submit(() -> {
+                inQueue.incrementAndGet();
+                for (Listener listener : listeners) listener.changed(this);
+                inQueue.decrementAndGet();
+            });
     }
 
     private static <T extends Comparable & Serializable> TreeMultimap<Double, T> createWeightMap() {

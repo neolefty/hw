@@ -36,6 +36,9 @@ public class LoadImageView extends StackImageView {
         Button chooseButton = new Button("Choose ...");
         chooseButton.setOnAction(value -> loadImageInteractive());
         controls.getChildren().add(chooseButton);
+        DecayHistoryMenu menu = new DecayHistoryMenu(fileHistory);
+        menu.valueProperty().addListener((observable, oldValue, newValue) -> loadImage(newValue));
+        controls.getChildren().add(menu);
 
         getChildren().add(controls);
 
@@ -88,6 +91,10 @@ public class LoadImageView extends StackImageView {
             }
     }
 
+    private void loadImage(String filename) {
+        loadImage(new File(filename));
+    }
+
     /** Load and display an image. */
     private void loadImage(File file) {
         // load from file in a worker thread
@@ -97,6 +104,9 @@ public class LoadImageView extends StackImageView {
                 this.curFile = file;
                 rememberFile(file);
             } catch (IOException e) {
+                try {
+                    fileHistory.remove(file.getCanonicalPath());
+                } catch(IOException ignored) {}
                 e.printStackTrace();
             }
         });
