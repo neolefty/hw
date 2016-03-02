@@ -35,50 +35,37 @@ public class ThreadedPixelProcessor extends PixelProcessor {
             Stopwatch watch = new Stopwatch();
             int h = original.getHeight(), w = original.getWidth();
 
-            // copy original to avoid messing up its acceleration
-            // (also, now we know its pixel format)
-            BufferedImage copyOrig = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
-            copyOrig.getGraphics().drawImage(original, 0, 0, null);
+            // copy original for two reasons
+            // 1. avoid messing up its acceleration
+            // 2. we can control the pixel format
+            BufferedImage copy = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
+            copy.getGraphics().drawImage(original, 0, 0, null);
+            int[] work = ((DataBufferInt) copy.getRaster().getDataBuffer()).getData();
             watch.mark("copy");
 
-//            DataBufferByte inBuf = (DataBufferByte) original.getRaster().getDataBuffer();
-            DataBufferInt inBuf = (DataBufferInt) copyOrig.getRaster().getDataBuffer();
-//            watch.mark("input buffer"); // always 0
-            int[] in = inBuf.getData();
-//            watch.mark("input array"); // always 0
-
-            // output buffer
-            BufferedImage result = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
-            DataBufferInt outBuf = (DataBufferInt) result.getRaster().getDataBuffer();
-            watch.mark("create tmp");
-            int[] out = outBuf.getData();
-//            watch.mark("output array"); // always 0
-
             // do the processing
-            int chunk = in.length / nPieces;
+            int chunk = work.length / nPieces;
             CountDownLatch latch = new CountDownLatch(nPieces);
             for (int i = 0; i < nPieces; ++i) {
                 // from a to b-1; ensure that we go right up to the end
-                final int a = i * chunk, b = (i == nPieces - 1 ? in.length : a + chunk);
+                final int a = i * chunk, b = (i == nPieces - 1 ? work.length : a + chunk);
+                final int finalI = i;
                 threadPool.submit(() -> {
                     for (int j = a; j < b; ++j)
-                        out[j] = getPixelFunction().apply(in[j]);
+                        work[j] = getPixelFunction().apply(work[j]);
+                    if (latch.getCount() == nPieces)
+                        watch.mark("first=" + finalI);
                     latch.countDown();
                 });
             }
-
             try { latch.await(); } catch (InterruptedException e) { e.printStackTrace(); }
 
-            watch.mark("process");
-            copyOrig.flush();
-
-//            for (int y = 0; y < original.getHeight(); ++y)
-//                for (int x = 0; x < original.getWidth(); ++x)
-//                    result.setRGB(x, y, process(original.getRGB(x, y)));
+            watch.mark("lag");
+            copy.flush();
 
             BufferedImage accel = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
-            accel.getGraphics().drawImage(result, 0, 0, null);
-            result.flush();
+            accel.getGraphics().drawImage(copy, 0, 0, null);
+            copy.flush();
             watch.mark("copy");
 
             System.out.println(getName() + " - " + (w * h) + " pixels - " + watch
