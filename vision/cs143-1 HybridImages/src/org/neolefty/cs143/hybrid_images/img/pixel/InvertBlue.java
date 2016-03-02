@@ -1,4 +1,4 @@
-package org.neolefty.cs143.hybrid_images.img;
+package org.neolefty.cs143.hybrid_images.img.pixel;
 
 /** Process image: invert all the blue values. For testing ... */
 public class InvertBlue implements IntToIntFunction {

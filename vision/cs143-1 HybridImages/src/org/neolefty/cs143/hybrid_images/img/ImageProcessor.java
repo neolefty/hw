@@ -1,4 +1,4 @@
-package org.neolefty.cs143.hybrid_images;
+package org.neolefty.cs143.hybrid_images.img;
 
 import javafx.beans.binding.ObjectBinding;
 import javafx.beans.property.ObjectProperty;

@@ -1,9 +1,9 @@
 package org.neolefty.cs143.hybrid_images.ui.util;
 
 import javafx.beans.property.ObjectProperty;
-import org.neolefty.cs143.hybrid_images.ImageProcessor;
-import org.neolefty.cs143.hybrid_images.img.IntToIntFunction;
-import org.neolefty.cs143.hybrid_images.img.ThreadedPixelProcessor;
+import org.neolefty.cs143.hybrid_images.img.ImageProcessor;
+import org.neolefty.cs143.hybrid_images.img.pixel.IntToIntFunction;
+import org.neolefty.cs143.hybrid_images.img.pixel.ThreadedPixelProcessor;
 import org.neolefty.cs143.hybrid_images.ui.HasBufferedImageProperty;
 import org.neolefty.cs143.hybrid_images.ui.StackImageView;
 

@@ -1,4 +1,4 @@
-package org.neolefty.cs143.hybrid_images.img;
+package org.neolefty.cs143.hybrid_images.img.pixel;
 
 /** A simple dimmer. */
 public class Dimmer implements IntToIntFunction {

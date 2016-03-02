@@ -1,6 +1,6 @@
-package org.neolefty.cs143.hybrid_images.img;
+package org.neolefty.cs143.hybrid_images.img.pixel;
 
-import org.neolefty.cs143.hybrid_images.ImageProcessor;
+import org.neolefty.cs143.hybrid_images.img.ImageProcessor;
 
 import java.awt.image.BufferedImage;
 
