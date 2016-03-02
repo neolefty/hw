@@ -9,4 +9,6 @@ public class ImagePassThrough extends ImageProcessor {
     public BufferedImage process(BufferedImage original) {
         return original;
     }
+
+    @Override public String getName() { return "nop"; }
 }

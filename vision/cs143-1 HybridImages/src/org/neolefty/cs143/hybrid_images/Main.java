@@ -3,7 +3,8 @@ package org.neolefty.cs143.hybrid_images;
 import javafx.application.Application;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
-import org.neolefty.cs143.hybrid_images.img.boof.BoofImageProcessor;
+import org.neolefty.cs143.hybrid_images.img.boof.BlurUInt8;
+import org.neolefty.cs143.hybrid_images.img.boof.BoofUInt8ImageProcessor;
 import org.neolefty.cs143.hybrid_images.img.pixel.Dimmer;
 import org.neolefty.cs143.hybrid_images.img.pixel.InvertBlue;
 import org.neolefty.cs143.hybrid_images.ui.LoadImageView;
@@ -35,7 +36,8 @@ public class Main extends Application {
         StackImageView mid2 = new ProcessedImageView(new Dimmer(), mid, threadPool);
 //        StackImageView right2 = new ProcessedImageView(new Dimmer(), mid, threadPool);
 //        StackImageView right2 = new ProcessedImageView(new RotateGBR(), right, threadPool);
-        StackImageView right2 = new ProcessedImageView(new BoofImageProcessor(), right, threadPool);
+        BoofUInt8ImageProcessor blur = new BoofUInt8ImageProcessor(new BlurUInt8(10));
+        StackImageView right2 = new ProcessedImageView(blur, right, threadPool);
 
         // TODO figure out how to make binding work
 //        blue.unprocessedImageProperty().bind(left.bufferedImageProperty());
