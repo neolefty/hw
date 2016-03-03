@@ -32,29 +32,31 @@ public class FftUInt8 implements Boof8Processor.Function {
         ConvertImage.convert(in, in32);
         PixelMath.divide(in32, 255f, in32); // rescale image brightness 0 to 1
 
+//        if (index == 0) ShowImages.showWindow(new ImageGridPanel(1, 1, VisualizeImageData.grayMagnitude(in32, null, 1)), "red");
+
         // do the FFT
         InterleavedF32 outFft32 = new InterleavedF32(w, h, 2);
         DiscreteFourierTransform<ImageFloat32, InterleavedF32> dft = DiscreteFourierTransformOps.createTransformF32();
         dft.forward(in32, outFft32);
 
         // convert to output
-        DiscreteFourierTransformOps.shiftZeroFrequency(outFft32, true);
         ImageFloat32 out32 = new ImageFloat32(w, h);
+        DiscreteFourierTransformOps.shiftZeroFrequency(outFft32, true);
         if (part == Part.magnitude) {
+
             DiscreteFourierTransformOps.magnitude(outFft32, out32);
-
-            BufferedImage visualMag = VisualizeImageData.grayMagnitude(out32, null, -1);
+            BufferedImage visualMag = VisualizeImageData.grayMagnitude(out32, null, 20);
             ImageGridPanel show = new ImageGridPanel(1, 1, visualMag);
-            ShowImages.showWindow(show, "Magnitude");
+            ShowImages.showWindow(show, "Magnitude " + index);
 
-            PixelMath.multiply(out32, 255f, out32); // rescale brightness to 0 to 255
+            PixelMath.multiply(out32, 70f, out32); // rescale brightness to 0 to 255
         }
         else if (part == Part.phase) {
             DiscreteFourierTransformOps.phase(outFft32, out32);
 
             BufferedImage visualPhase = VisualizeImageData.colorizeSign(out32, null, Math.PI);
             ImageGridPanel show = new ImageGridPanel(1, 1, visualPhase);
-            ShowImages.showWindow(show, "Phase");
+            ShowImages.showWindow(show, "Phase " + index);
 
             PixelMath.multiply(out32, (float) (255f / Math.PI), out32); // rescale brightness to 0 to 255
         }

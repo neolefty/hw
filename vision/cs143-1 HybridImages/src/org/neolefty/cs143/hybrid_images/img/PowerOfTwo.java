@@ -20,9 +20,13 @@ public class PowerOfTwo {
 
     /** Pad <tt>in</tt> to have dimensions that are a power of two, with a grey border.
      *  No effect if its dimensions are already powers of 2. */
-    public static BufferedImage pad(BufferedImage in) {
+    public static BufferedImage pad(BufferedImage in, boolean square) {
         int win = in.getWidth(), hin = in.getHeight();
         int wout = nextPowerOf2(win), hout = nextPowerOf2(hin);
+        if (square) {
+            wout = Math.max(hout, wout);
+            hout = wout;
+        }
         if (win == wout && hin == hout)
             return in;
         else {

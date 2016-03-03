@@ -1,6 +1,7 @@
 package org.neolefty.cs143.hybrid_images.ui.util;
 
 import javafx.beans.property.ObjectProperty;
+import javafx.scene.control.Tooltip;
 import org.neolefty.cs143.hybrid_images.img.ImageProcessor;
 import org.neolefty.cs143.hybrid_images.img.pixel.IntToIntFunction;
 import org.neolefty.cs143.hybrid_images.img.pixel.ThreadedPixelProcessor;
@@ -19,6 +20,7 @@ public class ProcessedImageView extends StackImageView {
         if (executorService == null)
             executorService = Executors.newSingleThreadExecutor();
         final ExecutorService ex = executorService;
+        Tooltip.install(this, new Tooltip(processor.getName()));
         source.addListener((observable, oldValue, newValue) -> {
 //            System.out.println("receiving new image: " + newValue.getWidth() + "x" + newValue.getHeight());
             ex.submit(() -> {
