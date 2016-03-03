@@ -48,7 +48,9 @@ public abstract class ImageProcessor {
 
     /** Implement this to do the processing. */
     public abstract BufferedImage process(BufferedImage original);
-    public abstract String getName();
+
+    /** Override to give a better name. */
+    public String getName() { return getClass().getSimpleName(); }
 
     public BufferedImage getProcessedImage() { return processedImage.getValue(); }
     public BufferedImage getUnprocessedImage() { return unprocessedImage.getValue(); }

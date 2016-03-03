@@ -19,19 +19,26 @@ public class ProcessedImageView extends StackImageView {
         if (executorService == null)
             executorService = Executors.newSingleThreadExecutor();
         final ExecutorService ex = executorService;
-        source.addListener((observable, oldValue, newValue) ->
-                ex.submit(() -> setImage(processor.process(newValue))));
+        source.addListener((observable, oldValue, newValue) -> {
+//            System.out.println("receiving new image: " + newValue.getWidth() + "x" + newValue.getHeight());
+            ex.submit(() -> {
+//                Stopwatch watch = new Stopwatch();
+                BufferedImage processed = processor.process(newValue);
+//                System.out.println("Processed to " + processed.getWidth() + "x" + processed.getHeight() + ": " + watch);
+                setImage(processed);
+            });
+        });
     }
 
     public ProcessedImageView(ImageProcessor processor,
-                              HasBufferedImageProperty source, ExecutorService executorService) {
-        this(processor, source.bufferedImageProperty(), executorService);
+                              HasBufferedImageProperty source, ExecutorService threadPool) {
+        this(processor, source.bufferedImageProperty(), threadPool);
     }
 
     public ProcessedImageView(IntToIntFunction pixelFunction,
-                              HasBufferedImageProperty source, ExecutorService executorService)
+                              HasBufferedImageProperty source, ExecutorService threadPool)
     {
-        this(new ThreadedPixelProcessor(pixelFunction), source, executorService);
+        this(new ThreadedPixelProcessor(pixelFunction, threadPool), source, threadPool);
     }
 
 //    public ProcessedImageView(IntToIntFunction pixelFunction, int n,

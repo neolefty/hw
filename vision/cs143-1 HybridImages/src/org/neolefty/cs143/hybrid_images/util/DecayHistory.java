@@ -16,7 +16,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class DecayHistory<T extends Comparable & Serializable> implements Externalizable {
     private static final long serialVersionUID = -6800609000471233355L;
     private static final int VERSION = 1;
-    private static final double DECAY = 0.9;
+    private static final double DECAY = 0.6;
 
     // largest first
     private TreeMultimap<Double, T> weightMap = createWeightMap();

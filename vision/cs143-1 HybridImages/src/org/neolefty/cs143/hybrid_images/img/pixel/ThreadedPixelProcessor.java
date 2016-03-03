@@ -6,19 +6,14 @@ import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 /** Multithreaded pixel processor. */
 public class ThreadedPixelProcessor extends PixelProcessor {
     private ExecutorService threadPool;
     private int nPieces;
 
-    public ThreadedPixelProcessor(IntToIntFunction pixelFunction) {
-        this(pixelFunction, Runtime.getRuntime().availableProcessors());
-    }
-
-    public ThreadedPixelProcessor(IntToIntFunction pixelFunction, int n) {
-        this(pixelFunction, Executors.newCachedThreadPool(), n);
+    public ThreadedPixelProcessor(IntToIntFunction pixelFunction, ExecutorService threadPool) {
+        this(pixelFunction, threadPool, Runtime.getRuntime().availableProcessors());
     }
 
     public ThreadedPixelProcessor(IntToIntFunction pixelFunction, ExecutorService executorService, int nPieces) {
