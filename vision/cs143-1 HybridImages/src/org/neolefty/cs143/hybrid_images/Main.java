@@ -1,12 +1,13 @@
 package org.neolefty.cs143.hybrid_images;
 
 import javafx.application.Application;
+import javafx.scene.Node;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
-import org.neolefty.cs143.hybrid_images.img.PowerOfTwoPadder;
-import org.neolefty.cs143.hybrid_images.img.boof.BlurUInt8;
+import org.neolefty.cs143.hybrid_images.img.ImageShrinker;
 import org.neolefty.cs143.hybrid_images.img.boof.Boof8Processor;
-import org.neolefty.cs143.hybrid_images.img.boof.LowPassUInt8;
+import org.neolefty.cs143.hybrid_images.img.boof.GaussBlur8;
+import org.neolefty.cs143.hybrid_images.img.boof.LowPass8;
 import org.neolefty.cs143.hybrid_images.ui.LoadImageView;
 import org.neolefty.cs143.hybrid_images.ui.StackImageView;
 import org.neolefty.cs143.hybrid_images.ui.util.PersistentScene;
@@ -28,60 +29,53 @@ public class Main extends Application {
         primaryStage.setTitle("CS143 #1 Hybrid Images");
 
         LoadImageView left = new LoadImageView(getClass(), "left");
-//        LoadImageView mid = new LoadImageView(getClass(), "mid");
-//        LoadImageView right = new LoadImageView(getClass(), "right");
+        LoadImageView right = new LoadImageView(getClass(), "right");
+        left.setPreprocessor(new ImageShrinker());
+        right.setPreprocessor(new ImageShrinker());
 
-//        StackImageView left2 = new ProcessedImageView(new InvertBlue(), left, threadPool);
-//        StackImageView left2 = new ProcessedImageView(new Dimmer(), mid, threadPool);
-//        StackImageView mid2 = new ProcessedImageView(new Dimmer(), mid, threadPool);
-//        StackImageView right2 = new ProcessedImageView(new Dimmer(), mid, threadPool);
-//        StackImageView right2 = new ProcessedImageView(new RotateGBR(), right, threadPool);
+//        StackImageView viewPadded = new ProcessedImageView(new PowerOfTwoPadder(false), left, threadPool);
+        StackImageView leftBlur = new ProcessedImageView(new GaussBlur8(10), left, threadPool);
+        StackImageView rightBlur = new ProcessedImageView(new GaussBlur8(10), right, threadPool);
 
-        StackImageView right = new ProcessedImageView(new PowerOfTwoPadder(false), left, threadPool);
-        Boof8Processor blur = new Boof8Processor(new BlurUInt8(10), threadPool);
-        StackImageView mid = new ProcessedImageView(blur, right, threadPool);
+//        Boof8Processor fftPassThrough = new Boof8Processor(new LowPassUInt8(10, 5), threadPool);
+//        StackImageView far = new ProcessedImageView(fftPassThrough, viewPadded, threadPool);
 
-        Boof8Processor fftPassThrough = new Boof8Processor(new LowPassUInt8(10, 5), threadPool);
-        StackImageView far = new ProcessedImageView(fftPassThrough, right, threadPool);
+        Boof8Processor lowPass = new Boof8Processor(new LowPass8(0.2), threadPool);
+        Boof8Processor lowPass11 = new Boof8Processor(new LowPass8(0.2, 11), threadPool);
+        Boof8Processor lowPass1Point5 = new Boof8Processor(new LowPass8(0.2, 1.5), threadPool);
+        Boof8Processor lowPass1 = new Boof8Processor(new LowPass8(0.2, 1), threadPool);
 
-        Boof8Processor fftLowPass = new Boof8Processor(new LowPassUInt8(0.2), threadPool);
-        Boof8Processor fftLowPass11 = new Boof8Processor(new LowPassUInt8(0.2, 11), threadPool);
-        Boof8Processor fftLowPass1point5 = new Boof8Processor(new LowPassUInt8(0.2, 1.5), threadPool);
-        Boof8Processor fftLowPass1 = new Boof8Processor(new LowPassUInt8(0.2, 1), threadPool);
-
-        StackImageView left2 = new ProcessedImageView(fftLowPass, right, threadPool);
-        StackImageView mid2 = new ProcessedImageView(fftLowPass11, right, threadPool);
-        StackImageView right2 = new ProcessedImageView(fftLowPass1point5, right, threadPool);
-        StackImageView far2 = new ProcessedImageView(fftLowPass1, right, threadPool);
+        StackImageView leftLow = new ProcessedImageView(lowPass, left, threadPool);
+        StackImageView rightLow = new ProcessedImageView(lowPass, right, threadPool);
+        StackImageView leftLow1 = new ProcessedImageView(lowPass1, left, threadPool);
+        StackImageView rightLow1 = new ProcessedImageView(lowPass1, right, threadPool);
 
 //        Boof8Processor fftMag = new Boof8Processor(new FftUInt8(FftUInt8.Part.magnitude), threadPool);
 //        Boof8Processor fftPhase = new Boof8Processor(new FftUInt8(FftUInt8.Part.phase), threadPool);
-//        StackImageView left2 = new ProcessedImageView(fftMag, right2, threadPool);
+//        StackImageView viewLowPadded = new ProcessedImageView(fftMag, right2, threadPool);
 //        StackImageView mid2 = new ProcessedImageView(fftPhase, right2, threadPool);
-
-        right.bufferedImageProperty().addListener((observable, oldValue, newValue)
-                -> System.out.println("Right is now " + newValue.getWidth() + "x" + newValue.getHeight()));
-
-        // TODO figure out how to make binding work
-//        blue.unprocessedImageProperty().bind(left.bufferedImageProperty());
-//        blueDisplay.bufferedImageProperty().bind(blue.processedImageProperty());
 
         GridPane outer = new StrictGrid();
         outer.setGridLinesVisible(true);
 
-        outer.add(left, 0, 0);
-        outer.add(mid, 1, 0);
-        outer.add(right, 2, 0);
-        outer.add(far, 3, 0);
-
-        outer.add(left2, 0, 1);
-        outer.add(mid2, 1, 1);
-        outer.add(right2, 2, 1);
-        outer.add(far2, 3, 1);
+        addToGrid(outer, 4, 2,
+                left, leftBlur, rightBlur, right,
+                leftLow1, leftLow, rightLow, rightLow1);
 
         PersistentScene scene = new PersistentScene(getClass(), outer, 600, 250);
         scene.setExitOnClose(true);
         primaryStage.setScene(scene);
         primaryStage.show();
+    }
+
+    private void addToGrid(GridPane outer, int w, int h, Node ... nodes) {
+        int i = 0;
+        for (int y = 0; y < h; ++y)
+            for (int x = 0; x < w; ++x)
+                if (i < nodes.length) {
+                    Node node = nodes[i++];
+                    if (node != null)
+                        outer.add(node, x, y);
+                }
     }
 }

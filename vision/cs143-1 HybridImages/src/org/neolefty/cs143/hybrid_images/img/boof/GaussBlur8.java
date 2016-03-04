@@ -4,10 +4,10 @@ import boofcv.alg.filter.blur.BlurImageOps;
 import boofcv.struct.image.ImageUInt8;
 
 /** A Gaussian blur. */
-public class BlurUInt8 implements Boof8Processor.Function {
+public class GaussBlur8 implements Boof8Processor.Function {
     private int radius;
 
-    public BlurUInt8(int radius) {
+    public GaussBlur8(int radius) {
         this.radius = radius;
     }
 

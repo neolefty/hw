@@ -5,8 +5,6 @@ import boofcv.alg.filter.blur.BlurImageOps;
 import boofcv.alg.misc.PixelMath;
 import boofcv.alg.transform.fft.DiscreteFourierTransformOps;
 import boofcv.core.image.ConvertImage;
-import boofcv.gui.image.ImageGridPanel;
-import boofcv.gui.image.ShowImages;
 import boofcv.gui.image.VisualizeImageData;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.struct.image.ImageFloat32;
@@ -18,7 +16,7 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 
 /** Low-pass filter an image. Works best if x & y are powers of 2. */
-public class LowPassUInt8 implements Boof8Processor.Function {
+public class LowPass8 implements Boof8Processor.Function {
     // how much of the FFT area do we remove? 0 to 1
     private double fraction;
     private double filterBlur;
@@ -30,7 +28,7 @@ public class LowPassUInt8 implements Boof8Processor.Function {
      *                    For example, if the filter radius ends up being 20, and the filterBlur is 5, then we
      *                    apply a 20/5 = 4-pixel gaussian blur to the filter before using it.
      *                    Higher numbers = less blurring, more ringing. */
-    public LowPassUInt8(double fraction, double filterBlur) {
+    public LowPass8(double fraction, double filterBlur) {
         this.fraction = fraction;
         this.filterBlur = filterBlur;
     }
@@ -38,7 +36,7 @@ public class LowPassUInt8 implements Boof8Processor.Function {
     /** Construct a new low-pass filter, with an unsoftened cutoff, so there will be ringing.
      *  @param fraction The fraction of area to conserve in the FFT, between 0 and 1.
      *                  Smaller numbers for heavier filtering. */
-    public LowPassUInt8(double fraction) {
+    public LowPass8(double fraction) {
         this(fraction, Double.MAX_VALUE);
     }
 
@@ -102,17 +100,16 @@ public class LowPassUInt8 implements Boof8Processor.Function {
         ConvertImage.convert(result32, result8);
         watch.mark("byte copy");
 
-        if (index == 0) {
-            ImageFloat32 reconstruct32 = new ImageFloat32(w, h);
-            dft.inverse(fftOrig32, reconstruct32);
-            ImageGridPanel show = new ImageGridPanel(2, 3,
-                    viz(orig32, 1), vizMag(fftOrig32), viz(reconstruct32),
-                    viz(spatialFilter32, 1), vizMag(fftResult32), viz(result32)
-//                    spatialFilterBI,
-            );
-            ShowImages.showWindow(show, fraction + " / " + filterBlur + " - original / filter - fft / multiplied - reconstructed / result");
-            watch.mark("visualize");
-        }
+//        if (index == 0) {
+//            ImageFloat32 reconstruct32 = new ImageFloat32(w, h);
+//            dft.inverse(fftOrig32, reconstruct32);
+//            ImageGridPanel show = new ImageGridPanel(2, 3,
+//                    viz(orig32, 1), vizMag(fftOrig32), viz(reconstruct32),
+//                    viz(spatialFilter32, 1), vizMag(fftResult32), viz(result32)
+//            );
+//            ShowImages.showWindow(show, fraction + " / " + filterBlur + " - original / filter - fft / multiplied - reconstructed / result");
+//            watch.mark("visualize");
+//        }
 
         System.out.println(" --> " + watch);
     }

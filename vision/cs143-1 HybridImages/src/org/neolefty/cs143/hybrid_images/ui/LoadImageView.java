@@ -1,13 +1,18 @@
 package org.neolefty.cs143.hybrid_images.ui;
 
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.geometry.Pos;
+import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.layout.FlowPane;
 import javafx.stage.FileChooser;
+import org.neolefty.cs143.hybrid_images.img.ImageProcessor;
 import org.neolefty.cs143.hybrid_images.util.DecayHistory;
 import org.neolefty.cs143.hybrid_images.util.ImageIOKit;
 import org.neolefty.cs143.hybrid_images.util.SetupKit;
 
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.concurrent.ExecutorService;
@@ -20,6 +25,7 @@ public class LoadImageView extends StackImageView {
     private DecayHistory<String> fileHistory;
     private File curFile;
     private static ExecutorService diskAccessThreadPool = Executors.newSingleThreadExecutor();
+    private ImageProcessor preprocessor = null;
 
     private static final String PREFS_FILE_HISTORY = "file_history";
 
@@ -42,10 +48,24 @@ public class LoadImageView extends StackImageView {
 
         getChildren().add(controls);
 
-        // load the previous image by default
-        File topFile = getMostRecentFile();
-        if (topFile != null && topFile.exists())
-            loadImage(topFile);
+        // wait until we're made visible for the first time before loading our image
+        parentProperty().addListener(new ChangeListener<Parent>() {
+            @Override
+            public void changed(ObservableValue<? extends Parent> observable, Parent oldValue, Parent newValue) {
+                if (newValue != null) { // if we're added to a parent
+                    parentProperty().removeListener(this); // only trigger once
+                    // load the previous image by default
+                    File topFile = getMostRecentFile();
+                    if (topFile != null && topFile.exists())
+                        loadImage(topFile);
+                }
+            }
+        });
+    }
+
+    /** Something that processes the image as soon as it's loaded. */
+    public void setPreprocessor(ImageProcessor preprocessor) {
+        this.preprocessor = preprocessor;
     }
 
     /** Either the current file or the top one in the history. */
@@ -104,7 +124,10 @@ public class LoadImageView extends StackImageView {
         // load from file in a worker thread
         diskAccessThreadPool.submit(() -> {
             try {
-                setImage(ImageIOKit.loadImage(file));
+                BufferedImage image = ImageIOKit.loadImage(file);
+                if (preprocessor != null)
+                    image = preprocessor.process(image);
+                setImage(image);
                 this.curFile = file;
                 rememberFile(file);
             } catch (IOException e) {

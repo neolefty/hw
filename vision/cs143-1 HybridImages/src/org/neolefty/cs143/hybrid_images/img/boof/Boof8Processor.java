@@ -63,7 +63,8 @@ public class Boof8Processor extends ImageProcessor {
             BufferedImage result = ConvertBufferedImage.convertTo(processed, null, true);
             watch.mark("convert back");
             double nsPerPixel = (watch.getElapsed() * 1000000) / (w * h);
-            System.out.println(getName() + " - " + watch + " - " + nsPerPixel + " ns per pixel" + " - " + getName());
+            System.out.println(getName() + " - " + watch + " - " + nsPerPixel + " ns per pixel"
+                    + " - " + w + "x" + h + " " + getName());
             return result;
         } catch(Exception e) {
             e.printStackTrace();
