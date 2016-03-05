@@ -53,9 +53,13 @@ public class Boof8Processor extends ImageProcessor {
             for (int i = 0; i < 3; ++i) {
                 final int finalI = i;
                 threadPool.submit(() -> {
-                    function.apply(boofImage.getBand(finalI), processed.getBand(finalI), finalI);
-                    latch.countDown();
-                    watch.mark("band " + finalI);
+                    try {
+                        function.apply(boofImage.getBand(finalI), processed.getBand(finalI), finalI);
+                        latch.countDown();
+                        watch.mark("band " + finalI);
+                    } catch(Exception e) {
+                        e.printStackTrace();
+                    }
                 });
             }
             latch.await();
