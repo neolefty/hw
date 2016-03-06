@@ -3,21 +3,28 @@ package org.neolefty.cs143.hybrid_images.img.boof;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.struct.image.ImageUInt8;
 import boofcv.struct.image.MultiSpectral;
+import javafx.beans.property.ReadOnlyObjectProperty;
+import javafx.beans.property.ReadOnlyObjectWrapper;
 import org.neolefty.cs143.hybrid_images.img.ImageProcessor;
+import org.neolefty.cs143.hybrid_images.ui.HasDebugWindow;
 import org.neolefty.cs143.hybrid_images.util.Stopwatch;
 
+import javax.swing.*;
 import java.awt.image.BufferedImage;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 /** Convert to BoofCV MultiSpectral ImageUInt8 and do something. Uses ThreadPool to process RGB bands separately. */
-public class Boof8Processor extends ImageProcessor {
+public class Boof8Processor extends ImageProcessor implements HasDebugWindow {
     private Function function;
     private ExecutorService threadPool;
+    private ReadOnlyObjectWrapper<JComponent> debugWindowProperty = new ReadOnlyObjectWrapper<>();
 
     public Boof8Processor(Function function, ExecutorService threadPool) {
         this.function = function;
+        if (function != null && function instanceof HasDebugWindow)
+            debugWindowProperty.bind(((HasDebugWindow) function).debugWindowProperty());
         if (threadPool == null)
             threadPool = Executors.newSingleThreadExecutor();
         this.threadPool = threadPool;
@@ -74,6 +81,11 @@ public class Boof8Processor extends ImageProcessor {
             e.printStackTrace();
             return null;
         }
+    }
+
+    @Override
+    public ReadOnlyObjectProperty<JComponent> debugWindowProperty() {
+        return debugWindowProperty.getReadOnlyProperty();
     }
 
     @Override

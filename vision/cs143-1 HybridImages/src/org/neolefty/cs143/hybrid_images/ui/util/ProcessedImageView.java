@@ -1,10 +1,12 @@
 package org.neolefty.cs143.hybrid_images.ui.util;
 
 import javafx.beans.property.ObjectProperty;
+import javafx.embed.swing.SwingNode;
 import javafx.scene.control.Tooltip;
 import org.neolefty.cs143.hybrid_images.img.ImageProcessor;
 import org.neolefty.cs143.hybrid_images.img.boof.Boof8Processor;
 import org.neolefty.cs143.hybrid_images.ui.HasBufferedImageProperty;
+import org.neolefty.cs143.hybrid_images.ui.HasDebugWindow;
 import org.neolefty.cs143.hybrid_images.ui.StackImageView;
 
 import java.awt.image.BufferedImage;
@@ -42,8 +44,21 @@ public class ProcessedImageView extends StackImageView {
 
     public void setImageProcessor(ImageProcessor processor) {
         if (processor != this.processor) {
-            Tooltip.install(this, new Tooltip(processor.toString()));
+
+            // show debug info in tooltip
+            Tooltip tip = new Tooltip(processor.toString());
+            if (processor instanceof HasDebugWindow) {
+                SwingNode node = new SwingNode();
+                ((HasDebugWindow) processor).debugWindowProperty().addListener((observable, oldValue, newValue) -> {
+                    node.setContent(newValue);
+                    tip.graphicProperty().setValue(node);
+                });
+            }
+            Tooltip.install(this, tip);
+
             this.processor = processor;
+
+            // reprocess the current image
             if (unprocessedImage != null)
                 setImage(getImageProcessor().process(unprocessedImage));
         }

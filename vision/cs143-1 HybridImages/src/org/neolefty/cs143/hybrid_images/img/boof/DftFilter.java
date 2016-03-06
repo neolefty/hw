@@ -5,21 +5,25 @@ import boofcv.alg.misc.PixelMath;
 import boofcv.alg.transform.fft.DiscreteFourierTransformOps;
 import boofcv.core.image.ConvertImage;
 import boofcv.gui.image.ImageGridPanel;
-import boofcv.gui.image.ShowImages;
 import boofcv.gui.image.VisualizeImageData;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageUInt8;
 import boofcv.struct.image.InterleavedF32;
+import javafx.beans.property.ReadOnlyObjectProperty;
+import javafx.beans.property.ReadOnlyObjectWrapper;
 import org.neolefty.cs143.hybrid_images.img.FilterGenerator;
 import org.neolefty.cs143.hybrid_images.img.Image32Generator;
+import org.neolefty.cs143.hybrid_images.ui.HasDebugWindow;
 import org.neolefty.cs143.hybrid_images.util.Stopwatch;
 
+import javax.swing.*;
 import java.awt.image.BufferedImage;
 
 /** Filter an image in the frequency domain, using a DFT.
  *  Most efficient if x & y are powers of 2, but not essential. */
-public class DftFilter implements Boof8Processor.Function {
+public class DftFilter implements Boof8Processor.Function, HasDebugWindow {
     private Image32Generator filterGenerator;
+    private ReadOnlyObjectWrapper<JComponent> debugPanelProperty = new ReadOnlyObjectWrapper<>();
 
     /** Construct a new filter. */
     public DftFilter(FilterGenerator filterGenerator) {
@@ -66,18 +70,26 @@ public class DftFilter implements Boof8Processor.Function {
         ConvertImage.convert(result32, result8);
         watch.mark("byte copy");
 
-        if (index == 0) {
+        if (index == 0) { // red
             ImageFloat32 reconstruct32 = new ImageFloat32(w, h);
             dft.inverse(fftOrig32, reconstruct32);
-            ImageGridPanel show = new ImageGridPanel(2, 3,
+            debugPanelProperty.setValue(new ImageGridPanel(2, 3,
                     viz(orig32, 1), vizMag(fftOrig32), viz(reconstruct32),
                     viz(filter32, 1), vizMag(fftResult32), viz(result32)
-            );
-            ShowImages.showWindow(show, filterGenerator + " - original / filter - fft / multiplied - reconstructed / result");
+            ) {
+                @Override public String toString() {
+                    return filterGenerator + " - original / filter - fft / multiplied - reconstructed / result";
+                }
+            });
             watch.mark("visualize");
         }
 
         System.out.println(" --> " + watch);
+    }
+
+    @Override
+    public ReadOnlyObjectProperty<JComponent> debugWindowProperty() {
+        return debugPanelProperty.getReadOnlyProperty();
     }
 
     private BufferedImage viz(ImageFloat32 image32) {

@@ -47,26 +47,37 @@ public class Main extends Application {
 
         ChooseProcessorView filterLeft1a = createFilterChooser(left, "left 1a");
         ChooseProcessorView filterLeft1b = createFilterChooser(filterLeft1a, "left 1b");
+        ChooseProcessorView filterLeft1c = createFilterChooser(filterLeft1b, "left 1c");
         ChooseProcessorView filterLeft2a = createFilterChooser(left, "left 2a");
         ChooseProcessorView filterLeft2b = createFilterChooser(filterLeft2a, "left 2b");
+        ChooseProcessorView filterLeft2c = createFilterChooser(filterLeft2b, "left 2c");
 
         ChooseProcessorView filterRight1a = createFilterChooser(right, "right 1a");
         ChooseProcessorView filterRight1b = createFilterChooser(filterRight1a, "right 1b");
+        ChooseProcessorView filterRight1c = createFilterChooser(filterRight1b, "right 1c");
         ChooseProcessorView filterRight2a = createFilterChooser(right, "right 2a");
         ChooseProcessorView filterRight2b = createFilterChooser(filterRight2a, "right 2b");
+        ChooseProcessorView filterRight2c = createFilterChooser(filterRight2b, "right 2c");
 
         GridPane outer = new StrictGrid();
         outer.setGridLinesVisible(true);
 
-        addToGrid(outer, 4, 3,
+        addToGrid(outer, 4, 4,
                 left, null, null, right,
                 filterLeft1a, filterLeft2a, filterRight2a, filterRight1a,
-                filterLeft1b, filterLeft2b, filterRight2b, filterRight1b);
+                filterLeft1b, filterLeft2b, filterRight2b, filterRight1b,
+                filterLeft1c, filterLeft2c, filterRight2c, filterRight1c);
 
         PersistentScene scene = new PersistentScene(getClass(), outer, 600, 250);
         scene.setExitOnClose(true);
         primaryStage.setScene(scene);
         primaryStage.show();
+
+        // turn on visual debugging after the initial things have all been submitted
+//        threadPool.submit(() -> {
+//            try { Thread.sleep(3000); } catch (InterruptedException ignored) { }
+//            threadPool.submit(() -> DftFilter.debug = true);
+//        });
     }
 
     private ChooseProcessorView createFilterChooser
