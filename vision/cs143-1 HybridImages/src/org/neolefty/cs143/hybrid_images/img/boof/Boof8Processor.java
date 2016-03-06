@@ -67,8 +67,8 @@ public class Boof8Processor extends ImageProcessor {
             BufferedImage result = ConvertBufferedImage.convertTo(processed, null, true);
             watch.mark("convert back");
             double nsPerPixel = (watch.getElapsed() * 1000000) / (w * h);
-            System.out.println(getName() + " - " + watch + " - " + nsPerPixel + " ns per pixel"
-                    + " - " + w + "x" + h + " " + getName());
+            System.out.println(toString() + " - " + watch + " - " + nsPerPixel + " ns per pixel"
+                    + " - " + w + "x" + h + " " + toString());
             return result;
         } catch(Exception e) {
             e.printStackTrace();
@@ -77,8 +77,8 @@ public class Boof8Processor extends ImageProcessor {
     }
 
     @Override
-    public String getName() {
-        return "BoofCV " + function.getClass().getSimpleName();
+    public String toString() {
+        return function.toString();
     }
 
     public interface Function {

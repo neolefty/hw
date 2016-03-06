@@ -42,7 +42,7 @@ public class LoadImageView extends StackImageView {
         Button chooseButton = new Button("Choose ...");
         chooseButton.setOnAction(value -> loadImageInteractive());
         controls.getChildren().add(chooseButton);
-        DecayHistoryMenu menu = new DecayHistoryMenu(fileHistory);
+        FileHistoryMenu menu = new FileHistoryMenu(fileHistory);
         menu.valueProperty().addListener((observable, oldValue, newValue) -> loadImage(newValue));
         controls.getChildren().add(menu);
 
@@ -111,7 +111,7 @@ public class LoadImageView extends StackImageView {
             }
     }
 
-    private void loadImage(Shortener shortener) {
+    private void loadImage(FilenameShortener shortener) {
         loadImage(shortener.getVerbose());
     }
 

@@ -17,8 +17,9 @@ public abstract class SlowPixelProcessor extends ImageProcessor {
         return pixelFunction;
     }
 
-    public String getName() {
-        return pixelFunction.getClass().getSimpleName();
+    @Override
+    public String toString() {
+        return pixelFunction.toString();
     }
 
     @Override
@@ -34,7 +35,7 @@ public abstract class SlowPixelProcessor extends ImageProcessor {
                 for (int x = 0; x < w; ++x)
                     result.setRGB(x, y, pixelFunction.apply(original.getRGB(x, y)));
 
-            System.out.println(getName() + ": " +(w * h) + " pixels "
+            System.out.println(toString() + ": " +(w * h) + " pixels "
                     + watch + " (" + (1000000 * watch.getElapsed() / (w * h)) + " ns per pixel)");
             return result;
         }

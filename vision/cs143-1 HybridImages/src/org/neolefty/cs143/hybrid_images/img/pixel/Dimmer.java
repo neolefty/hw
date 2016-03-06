@@ -9,4 +9,9 @@ public class Dimmer implements IntToIntFunction {
                 + ((((pixel & 0xff0000) >> 16) / 2) << 16) // red
                 + (pixel & 0xff000000); // alpha
     }
+
+    @Override
+    public String toString() {
+        return "50% Dim";
+    }
 }

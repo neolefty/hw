@@ -94,4 +94,9 @@ public class DftFilter implements Boof8Processor.Function {
         DiscreteFourierTransformOps.magnitude(fft, viz32);
         return VisualizeImageData.grayMagnitude(viz32, null, 50);
     }
+
+    @Override
+    public String toString() {
+        return filterGenerator.toString();
+    }
 }

@@ -15,4 +15,9 @@ public class GaussBlur8 implements Boof8Processor.Function {
     public void apply(ImageUInt8 in, ImageUInt8 out, int index) {
         BlurImageOps.gaussian(in, out, -1, radius, null);
     }
+
+    @Override
+    public String toString() {
+        return "Gaussian blur " + radius;
+    }
 }

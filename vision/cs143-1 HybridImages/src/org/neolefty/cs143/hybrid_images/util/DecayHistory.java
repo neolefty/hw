@@ -23,11 +23,18 @@ public class DecayHistory<T extends Comparable & Serializable> implements Extern
     // value to weight
     private HashMap<T, Double> valueMap = new HashMap<>();
 
+    /** Add to the top of the history. */
     public void add(T value) {
         decay(); // update all weights
         Double oldWeight = remove(value); // remove old weight
         Double newWeight = oldWeight == null ? 1. : oldWeight + 1.; // add 1 to the weight
         put(newWeight, value); // insert this one at the top
+        notifyListeners();
+    }
+
+    /** Is this value contained in the history? */
+    public boolean contains(T value) {
+        return valueMap.containsKey(value);
     }
 
     /** A list of values in weighted order, heaviest first. */
@@ -37,6 +44,7 @@ public class DecayHistory<T extends Comparable & Serializable> implements Extern
 
     // TODO extract into helper or super class, or maybe just use ObjectWrapper
     public interface Listener { void changed(DecayHistory h); }
+
     private Set<Listener> listeners = new HashSet<>();
     /** Listen for changes to this. */
     public void addListener(Listener listener) { listeners.add(listener); }
@@ -84,7 +92,9 @@ public class DecayHistory<T extends Comparable & Serializable> implements Extern
             return weightMap.values().iterator().next();
     }
 
-    private void put(Double weight, T value) { put(weightMap, weight, value); }
+    private void put(Double weight, T value) {
+        put(weightMap, weight, value);
+    }
 
     private void put(TreeMultimap<Double, T> map, Double weight, T value) {
         map.put(weight, value);

@@ -10,5 +10,5 @@ public class ImagePassThrough extends ImageProcessor {
         return original;
     }
 
-    @Override public String getName() { return "nop"; }
+    @Override public String toString() { return "nop"; }
 }

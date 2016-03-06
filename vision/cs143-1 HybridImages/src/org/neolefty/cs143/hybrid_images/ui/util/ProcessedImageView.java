@@ -4,8 +4,6 @@ import javafx.beans.property.ObjectProperty;
 import javafx.scene.control.Tooltip;
 import org.neolefty.cs143.hybrid_images.img.ImageProcessor;
 import org.neolefty.cs143.hybrid_images.img.boof.Boof8Processor;
-import org.neolefty.cs143.hybrid_images.img.pixel.IntToIntFunction;
-import org.neolefty.cs143.hybrid_images.img.pixel.ThreadedPixelProcessor;
 import org.neolefty.cs143.hybrid_images.ui.HasBufferedImageProperty;
 import org.neolefty.cs143.hybrid_images.ui.StackImageView;
 
@@ -15,21 +13,19 @@ import java.util.concurrent.Executors;
 
 /** Display a processed image. */
 public class ProcessedImageView extends StackImageView {
+    private ImageProcessor processor;
+    private BufferedImage unprocessedImage;
+//    private ObjectProperty<ImageProcessor> processorProperty = new SimpleObjectProperty<>();
+
     public ProcessedImageView(ImageProcessor processor,
                               ObjectProperty<BufferedImage> source, ExecutorService executorService)
     {
         if (executorService == null)
             executorService = Executors.newSingleThreadExecutor();
         final ExecutorService ex = executorService;
-        Tooltip.install(this, new Tooltip(processor.getName()));
+        setImageProcessor(processor);
         source.addListener((observable, oldValue, newValue) -> {
-//            System.out.println("receiving new image: " + newValue.getWidth() + "x" + newValue.getHeight());
-            ex.submit(() -> {
-//                Stopwatch watch = new Stopwatch();
-                BufferedImage processed = processor.process(newValue);
-//                System.out.println("Processed to " + processed.getWidth() + "x" + processed.getHeight() + ": " + watch);
-                setImage(processed);
-            });
+            ex.submit(() -> setUnprocessedImage(newValue));
         });
     }
 
@@ -38,17 +34,39 @@ public class ProcessedImageView extends StackImageView {
         this(processor, source.bufferedImageProperty(), threadPool);
     }
 
-    public ProcessedImageView(IntToIntFunction pixelFunction,
-                              HasBufferedImageProperty source, ExecutorService threadPool)
-    {
-        this(new ThreadedPixelProcessor(pixelFunction, threadPool), source, threadPool);
-    }
-
     public ProcessedImageView(Boof8Processor.Function function,
                               HasBufferedImageProperty source, ExecutorService threadPool)
     {
         this(new Boof8Processor(function, threadPool), source, threadPool);
     }
+
+    public void setImageProcessor(ImageProcessor processor) {
+        if (processor != this.processor) {
+            Tooltip.install(this, new Tooltip(processor.toString()));
+            this.processor = processor;
+            if (unprocessedImage != null)
+                setImage(getImageProcessor().process(unprocessedImage));
+        }
+    }
+
+    public void setUnprocessedImage(BufferedImage image) {
+        if (image != this.unprocessedImage) {
+            // System.out.println("receiving new image: " + newValue.getWidth() + "x" + newValue.getHeight());
+            this.unprocessedImage = image;
+            // Stopwatch watch = new Stopwatch();
+            if (image != null)
+                setImage(getImageProcessor().process(image));
+            // System.out.println("Processed to " + processed.getWidth() + "x" + processed.getHeight() + ": " + watch);
+        }
+    }
+
+    public ImageProcessor getImageProcessor() { return processor; }
+
+//    public ProcessedImageView(IntToIntFunction pixelFunction,
+//                              HasBufferedImageProperty source, ExecutorService threadPool)
+//    {
+//        this(new ThreadedPixelProcessor(pixelFunction, threadPool), source, threadPool);
+//    }
 
 //    public ProcessedImageView(IntToIntFunction pixelFunction, int n,
 //                              HasBufferedImageProperty source, ExecutorService executorService)

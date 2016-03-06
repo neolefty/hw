@@ -8,4 +8,9 @@ public class RotateGBR implements IntToIntFunction {
                 + ((p & 0xff0000) >> 16) // red
                 + (p & 0xff000000); // alpha
     }
+
+    @Override
+    public String toString() {
+        return "Rotate R->G->B->R";
+    }
 }

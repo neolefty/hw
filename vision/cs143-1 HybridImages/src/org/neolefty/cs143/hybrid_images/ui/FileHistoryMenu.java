@@ -9,19 +9,20 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-/** A dropdown menu showing a {@link DecayHistory}. */
+/** A dropdown menu showing a {@link DecayHistory} of files.
+ *  Assumes that whenever a file is selected, it will be added to the history externally. */
 // TODO update when image changed interactively -- not important enough for now
-public class DecayHistoryMenu extends ComboBox<Shortener> {
-    private ObservableListWrapper<Shortener> items;
+public class FileHistoryMenu extends ComboBox<FilenameShortener> {
+    private ObservableListWrapper<FilenameShortener> items;
     public static final int DISPLAY_COUNT = 15;
 
-    public DecayHistoryMenu(DecayHistory<String> history) {
+    public FileHistoryMenu(DecayHistory<String> history) {
         items = new ObservableListWrapper<>(new ArrayList<>(shorten(history.values())));
         setItems(items);
         if (items.size() > 0)
             setValue(items.get(0));
+        // whenever a file is added to the history, update our display
         history.addListener(this::update);
-        update(history);
     }
 
     private void update(DecayHistory<String> history) {
@@ -29,12 +30,12 @@ public class DecayHistoryMenu extends ComboBox<Shortener> {
         items.addAll(shorten(history.values()));
     }
 
-    private List<Shortener> shorten(Collection<String> paths) {
-        List<Shortener> result = new ArrayList<>();
+    private List<FilenameShortener> shorten(Collection<String> paths) {
+        List<FilenameShortener> result = new ArrayList<>();
         int i = 0;
         for (String path : paths) {
             File file = new File(path);
-            result.add(new Shortener(file.getParentFile().getName() + "/" + file.getName(), path));
+            result.add(new FilenameShortener(file.getParentFile().getName() + "/" + file.getName(), path));
             if (++i >= DISPLAY_COUNT)
                 break;
         }

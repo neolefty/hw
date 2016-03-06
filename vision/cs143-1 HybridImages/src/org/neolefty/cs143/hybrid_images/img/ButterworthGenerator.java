@@ -26,7 +26,6 @@ public class ButterworthGenerator extends FilterGenerator {
         int wHalf = w / 2, hHalf = h / 2;
         ImageFloat32 result = new ImageFloat32(w, h);
         // take advantage of symmetry
-        watch.mark("generating ... ");
         float r2 = (float) (computeRadius(w, h) * computeRadius(w, h));
         for (int y = 0; y < hHalf; ++y) {
             for (int x = 0; x < wHalf; ++x) {
@@ -37,7 +36,6 @@ public class ButterworthGenerator extends FilterGenerator {
                 result.set(wHalf + x, hHalf - y, z);
             }
         }
-        watch.mark("generated");
         return result;
     }
 
@@ -69,6 +67,6 @@ public class ButterworthGenerator extends FilterGenerator {
 
     @Override
     public String toString() {
-        return "Butterworth " + (isLowPass() ? "low" : "high") + "-pass [" + order + "]";
+        return "Butterworth " + (isLowPass() ? "low" : "high") + "-pass " + getFraction() + " [" + order + "]";
     }
 }
