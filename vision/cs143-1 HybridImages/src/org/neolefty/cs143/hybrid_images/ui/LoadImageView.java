@@ -1,5 +1,6 @@
 package org.neolefty.cs143.hybrid_images.ui;
 
+import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.geometry.Pos;
@@ -8,11 +9,10 @@ import javafx.scene.control.Button;
 import javafx.scene.layout.FlowPane;
 import javafx.stage.FileChooser;
 import org.neolefty.cs143.hybrid_images.img.ImageProcessor;
+import org.neolefty.cs143.hybrid_images.ui.util.ProcessedBI;
 import org.neolefty.cs143.hybrid_images.util.DecayHistory;
-import org.neolefty.cs143.hybrid_images.util.ImageIOKit;
 import org.neolefty.cs143.hybrid_images.util.SetupKit;
 
-import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.concurrent.ExecutorService;
@@ -23,9 +23,9 @@ public class LoadImageView extends StackImageView {
     private Class prefsClass;
     private String prefsFileHistoryKey;
     private DecayHistory<String> fileHistory;
-    private File curFile;
     private static ExecutorService diskAccessThreadPool = Executors.newSingleThreadExecutor();
     private ImageProcessor preprocessor = null;
+    private ReadOnlyObjectWrapper<ProcessedBI> imageProperty = new ReadOnlyObjectWrapper<>();
 
     private static final String PREFS_FILE_HISTORY = "file_history";
 
@@ -46,7 +46,8 @@ public class LoadImageView extends StackImageView {
         menu.valueProperty().addListener((observable, oldValue, newValue) -> loadImage(newValue));
         controls.getChildren().add(menu);
 
-        getChildren().add(controls);
+        if (getControlPane().getBottom() != null) throw new IllegalStateException();
+        getControlPane().setBottom(controls);
 
         // wait until we're made visible for the first time before loading our image
         parentProperty().addListener(new ChangeListener<Parent>() {
@@ -70,12 +71,13 @@ public class LoadImageView extends StackImageView {
 
     /** Either the current file or the top one in the history. */
     private File getMostRecentFile() {
-        if (curFile != null)
-            return curFile;
-        else {
+        ProcessedBI pbi = imageProperty.getValue();
+        if (pbi == null) {
             String topName = fileHistory.getTop();
             return topName == null ? null : new File(topName);
         }
+        else
+            return pbi.getFile();
     }
 
     /** Either the current file's directory or the top one in history. */
@@ -112,7 +114,8 @@ public class LoadImageView extends StackImageView {
     }
 
     private void loadImage(FilenameShortener shortener) {
-        loadImage(shortener.getVerbose());
+        if (shortener != null)
+            loadImage(shortener.getVerbose());
     }
 
     private void loadImage(String filename) {
@@ -122,19 +125,18 @@ public class LoadImageView extends StackImageView {
     /** Load and display an image. */
     private void loadImage(File file) {
         // load from file in a worker thread
-        diskAccessThreadPool.submit(() -> {
+        diskAccessThreadPool.execute(() -> {
             try {
-                BufferedImage image = ImageIOKit.loadImage(file);
+                ProcessedBI image = new ProcessedBI(file);
                 if (preprocessor != null)
-                    image = preprocessor.process(image);
+                    image = image.process(preprocessor);
                 setImage(image);
-                this.curFile = file;
                 rememberFile(file);
             } catch (IOException e) {
+                e.printStackTrace();
                 try {
                     fileHistory.remove(file.getCanonicalPath());
                 } catch(IOException ignored) {}
-                e.printStackTrace();
             }
         });
     }

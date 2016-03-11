@@ -1,25 +1,22 @@
 package org.neolefty.cs143.hybrid_images.img;
 
 import boofcv.struct.image.ImageFloat32;
-import org.neolefty.cs143.hybrid_images.util.Stopwatch;
+import org.neolefty.cs143.hybrid_images.ui.ProcessorParam;
 
 /** Generates Butterworth filters. */
 public class ButterworthGenerator extends FilterGenerator {
-    private int order;
+    private ProcessorParam order
+            = new ProcessorParam("order", 1, 1, 12, "What order of Butterworth filter?");
 
-    /** Create a Butterworth filter generator.
-     *  @param fraction The fraction of area in the center of the FFT, between 0 and 1.
-     *                  Smaller numbers for a smaller circle.
-     *  @param order What order of Butterworth filter (a positive integer). */
-    public ButterworthGenerator(double fraction, Type type, int order) {
-        super(type, fraction);
-        this.order = order;
+    /** Create a Butterworth filter generator. */
+    public ButterworthGenerator() {
+        order.setInteger(true);
+        super.addParam(order);
     }
 
     // TODO: consider using a thread pool
     @Override
     public ImageFloat32 generate(int w, int h) {
-        Stopwatch watch = new Stopwatch(true);
 // How to hack these so that odd works? Maybe two separate values, half & halfMinus1?
 //        int wHalf = (w % 2 == 0) ? w / 2 : (w + 1) / 2;
 //        int hHalf = (h % 2 == 0) ? h / 2 : (h + 1) / 2;
@@ -41,15 +38,16 @@ public class ButterworthGenerator extends FilterGenerator {
 
     private float coeff2(int x, int y, float r2) {
         float w = isLowPass() ? (x*x + y*y) / r2 : r2 / (x*x + y*y);
+        int rdr = order.intValue();
         //noinspection StatementWithEmptyBody
-        if (order != 1) {
+        if (rdr != 1) {
             float w2 = w * w;
-            switch (order) {
+            switch (rdr) {
                 case 2: w = w2; break;
                 case 3: w = w2 * w; break;
                 default: {
                     float w4 = w2 * w2;
-                    switch (order) {
+                    switch (rdr) {
                         case 4: w = w4; break;
                         case 5: w = w4 * w; break;
                         case 6: w = w4 * w2; break;
@@ -57,7 +55,7 @@ public class ButterworthGenerator extends FilterGenerator {
                         case 8: w = w4 * w4; break;
                         case 9: w = w4 * w4 * w; break;
                         case 10: w = w4 * w4 * w2; break;
-                        default: w = (float) Math.pow(w, order);
+                        default: w = (float) Math.pow(w, rdr);
                     }
                 }
             }
@@ -65,8 +63,10 @@ public class ButterworthGenerator extends FilterGenerator {
         return (float) (1. / Math.sqrt(1 + w));
     }
 
-    @Override
-    public String toString() {
-        return "Butterworth " + (isLowPass() ? "low" : "high") + "-pass " + getFraction() + " [" + order + "]";
-    }
+//    @Override
+//    public String toString() {
+//        return "Butterworth " + (isLowPass() ? "low" : "high") + "-pass " + getFraction() + " [" + order + "]";
+//    }
+
+    @Override public String toString() { return "Butterworth"; }
 }

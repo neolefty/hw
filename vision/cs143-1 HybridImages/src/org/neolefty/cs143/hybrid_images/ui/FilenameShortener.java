@@ -16,4 +16,17 @@ class FilenameShortener {
     @Override public String toString() {
         return abbrev;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        FilenameShortener that = (FilenameShortener) o;
+        return verbose.equals(that.verbose);
+    }
+
+    @Override
+    public int hashCode() {
+        return verbose.hashCode();
+    }
 }

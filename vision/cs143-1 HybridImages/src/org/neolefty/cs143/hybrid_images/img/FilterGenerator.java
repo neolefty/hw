@@ -1,5 +1,12 @@
 package org.neolefty.cs143.hybrid_images.img;
 
+import org.neolefty.cs143.hybrid_images.ui.ProcessorParam;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+
 /** Base class for low- and high-pass filter generators. */
 public abstract class FilterGenerator implements Image32Generator {
     public enum Type {
@@ -7,24 +14,30 @@ public abstract class FilterGenerator implements Image32Generator {
     }
 
     // how much of the FFT area do we remove? 0 to 1
-    private double fraction;
-    private Type type;
+    private ProcessorParam fraction = new ProcessorParam
+            ("fraction", 0.2, -5, 5,
+                    "How strong is the filter? Negative for high-pass, positive for low-pass.");
 
-    /** Create a filter generator
-     *  @param type low-pass or high-pass
-     *  @param fraction The fraction of area in the center of the FFT, between 0 and 1.
-     *                  Smaller numbers for a smaller circle. */
-    public FilterGenerator(Type type, double fraction) {
-        this.type = type;
-        this.fraction = fraction;
+    private List<ProcessorParam> params = Collections.singletonList(fraction);
+
+    protected void addParam(ProcessorParam param) {
+        List<ProcessorParam> tmp = new ArrayList<>(params);
+        tmp.add(param);
+        params = Collections.unmodifiableList(tmp);
     }
 
-    /** The fraction of area in the center of the FFT, between 0 and 1.
-     *  Smaller numbers for a smaller circle (lower frequencies). */
-    public double getFraction() { return fraction; }
+    /** The fraction of area in the circle in the center of the FFT.
+     *  Smaller numbers for a smaller circle (lower frequencies affected).
+     *  Negative is high-pass, positive is low-pass.
+     *  Simplification: Ignore the portion of the circle outside the FFT rectangle. */
+    public double getFraction() { return fraction.doubleValue(); }
 
     /** Low-pass or high-pass? */
-    public Type getFilterType() { return type; }
+    public Type getFilterType() {
+        return fraction.doubleValue() <= 0 ? Type.highPass : Type.lowPass;
+    }
+
+    @Override public Collection<ProcessorParam> getProcessorParams() { return params; }
 
     /** Compute the radius of this filter for a given FFT size, based on this filter's {@link #getFraction}. */
     public double computeRadius(int w, int h) {
@@ -38,10 +51,11 @@ public abstract class FilterGenerator implements Image32Generator {
         //
         // In the extreme case, if the circle completely covers the image,
         // the result will be an all-pass filter.
-        return Math.sqrt(fraction * w * h / Math.PI);
+        double f = Math.abs(fraction.doubleValue());
+        return Math.sqrt(f * w * h / Math.PI);
     }
 
-    public boolean isLowPass() { return type == Type.lowPass; }
+    public boolean isLowPass() { return getFilterType() == Type.lowPass; }
 
     @Override
     public String toString() {

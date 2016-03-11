@@ -45,7 +45,7 @@ public class PixelProcessor extends UnthreadedPixelProcessor {
                 // from a to b-1; ensure that we go right up to the end
                 final int a = i * chunk, b = (i == nPieces - 1 ? work.length : a + chunk);
                 final int finalI = i;
-                threadPool.submit(() -> {
+                threadPool.execute(() -> {
                     for (int j = a; j < b; ++j)
                         work[j] = getPixelFunction().apply(work[j]);
                     if (latch.getCount() == nPieces)

@@ -1,8 +1,8 @@
 package org.neolefty.cs143.hybrid_images.util;
 
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicLong;
 
 /** Minimal wrapper around an ExecutorService that catches and prints exceptions
  *  from the runnables and callables. */
@@ -99,14 +99,34 @@ public class ThrowablePrintingExecutorService implements ExecutorService {
         }
     }
 
+    private AtomicLong executions = new AtomicLong();
+    Set<Runnable> currentlyRunning = Collections.synchronizedSet(new HashSet<>());
+
     @Override
     public void execute(Runnable command) {
+        long x = executions.getAndIncrement();
+        ThreadPoolExecutor tpe = (ThreadPoolExecutor) wrapped;
         try {
-            wrapped.execute(command);
+            int inQueue = tpe.getQueue().size();
+            tpe.purge();
+            int purged = tpe.getQueue().size() - inQueue;
+
+            System.out.println("Enter " + x + " >> Queue = " + inQueue + "; purged = " + purged
+                    + "; Active = " + tpe.getActiveCount() + "(" + currentlyRunning.size() + ") >> "
+                    + command.getClass().getName());
+            wrapped.execute(() -> {
+                currentlyRunning.add(command);
+                command.run();
+                currentlyRunning.remove(command);
+            });
         } catch(Throwable t) {
             t.printStackTrace();
             t.fillInStackTrace();
+            System.out.println("ERROR " + x + " ** Active = " + tpe.getActiveCount()
+                    + "(" + currentlyRunning.size() + ") ** " + command.getClass().getName());
             throw t;
         }
+        System.out.println("Exit " + x + " << Active = " + tpe.getActiveCount()
+                + "(" + currentlyRunning.size() + ") << " + command.getClass().getName());
     }
 }

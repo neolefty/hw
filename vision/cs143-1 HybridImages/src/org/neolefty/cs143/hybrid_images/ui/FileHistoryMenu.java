@@ -1,6 +1,7 @@
 package org.neolefty.cs143.hybrid_images.ui;
 
 import com.sun.javafx.collections.ObservableListWrapper;
+import javafx.application.Platform;
 import javafx.scene.control.ComboBox;
 import org.neolefty.cs143.hybrid_images.util.DecayHistory;
 
@@ -26,8 +27,18 @@ public class FileHistoryMenu extends ComboBox<FilenameShortener> {
     }
 
     private void update(DecayHistory<String> history) {
-        items.clear();
-        items.addAll(shorten(history.values()));
+        List<FilenameShortener> shortened = shorten(history.values());
+        Platform.runLater(() -> { // need to do this because a side-effect of retainAll() can be a UI change
+            try {
+                // non-destructive update
+                items.retainAll(shortened);
+                for (FilenameShortener fs : shortened)
+                    if (!items.contains(fs))
+                        items.add(fs);
+            } catch(Exception e) {
+                e.printStackTrace();
+            }
+        });
     }
 
     private List<FilenameShortener> shorten(Collection<String> paths) {

@@ -3,6 +3,7 @@ package org.neolefty.cs143.hybrid_images.img;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 
+// TODO parameterize
 /** Scale down an image if it is too large */
 public class ImageShrinker extends ImageProcessor {
     private int maxPixels;

@@ -4,32 +4,20 @@ import boofcv.alg.filter.blur.BlurImageOps;
 import boofcv.alg.misc.PixelMath;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.struct.image.ImageFloat32;
+import org.neolefty.cs143.hybrid_images.ui.ProcessorParam;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
 
 /** Generates simple FFT filter images, optionally with a Gaussian blur to reduce ringing. */
 public class SimpleFilterGenerator extends FilterGenerator {
-    private double filterBlur;
+    private ProcessorParam filterBlur = new ProcessorParam("filter blur", 1, 0, 10,
+            "Blurring the filter reduces ringing. Higher number = less blurring, more ringing."
+                    + " 0 = no blurring, maximum ringing.");
 
-    /** Construct a new filter generator.
-     *  @param fraction The fraction of area in the center of the FFT, between 0 and 1.
-     *                  Smaller numbers for a smaller circle.
-     *  @param filterBlur How much to blur the filter, to cut down on ringing, as a fraction of the filter.
-     *                    For example, if the filter radius ends up being 20, and the filterBlur is 5, then we
-     *                    apply a 20/5 = 4-pixel gaussian blur to the filter before using it.
-     *                    Higher numbers = less blurring, more ringing.
-     *                    0 or less = ignored. */
-    public SimpleFilterGenerator(double fraction, double filterBlur, Type type) {
-        super(type, fraction);
-        this.filterBlur = filterBlur;
-    }
-
-    /** Construct a new filter generator with no filter blur (there will be ringing)
-     *  @param fraction The fraction of area in the center of the FFT, between 0 and 1.
-     *                  Smaller numbers for a smaller circle. */
-    public SimpleFilterGenerator(double fraction, Type type) {
-        this(fraction, -1, type);
+    /** Create a simple filter generator. */
+    public SimpleFilterGenerator() {
+        super.addParam(filterBlur);
     }
 
     @Override
@@ -52,8 +40,8 @@ public class SimpleFilterGenerator extends FilterGenerator {
         ConvertBufferedImage.convertFrom(resultBI, result32);
 
         // blur, if requested & more than 1 pixel of blur
-        if (filterBlur > 0) {
-            int blurRadius = (int) (r / filterBlur);
+        if (filterBlur.doubleValue() > 0) {
+            int blurRadius = (int) (r / filterBlur.doubleValue());
             if (blurRadius >= 2)
                 result32 = BlurImageOps.gaussian(result32, null, -1, blurRadius, null);
         }
@@ -64,8 +52,14 @@ public class SimpleFilterGenerator extends FilterGenerator {
         return result32;
     }
 
+//    @Override
+//    public String toString() {
+//        return super.toString() + (filterBlur.doubleValue() > 0 ? " blur " + filterBlur.doubleValue() : "");
+//    }
+
+
     @Override
     public String toString() {
-        return super.toString() + (filterBlur > 0 ? " blur " + filterBlur : "");
+        return "DFT circle filter";
     }
 }

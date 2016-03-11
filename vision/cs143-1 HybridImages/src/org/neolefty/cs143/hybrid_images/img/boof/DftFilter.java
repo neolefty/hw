@@ -14,10 +14,12 @@ import javafx.beans.property.ReadOnlyObjectWrapper;
 import org.neolefty.cs143.hybrid_images.img.FilterGenerator;
 import org.neolefty.cs143.hybrid_images.img.Image32Generator;
 import org.neolefty.cs143.hybrid_images.ui.HasDebugWindow;
+import org.neolefty.cs143.hybrid_images.ui.ProcessorParam;
 import org.neolefty.cs143.hybrid_images.util.Stopwatch;
 
 import javax.swing.*;
 import java.awt.image.BufferedImage;
+import java.util.Collection;
 
 /** Filter an image in the frequency domain, using a DFT.
  *  Most efficient if x & y are powers of 2, but not essential. */
@@ -97,6 +99,11 @@ public class DftFilter implements Boof8Processor.Function, HasDebugWindow {
     }
     private BufferedImage viz(ImageFloat32 image32, double normalize) {
         return VisualizeImageData.grayMagnitude(image32, null, normalize);
+    }
+
+    @Override
+    public Collection<ProcessorParam> getProcessorParams() {
+        return filterGenerator.getProcessorParams();
     }
 
     public static BufferedImage vizMag(InterleavedF32 fft) {

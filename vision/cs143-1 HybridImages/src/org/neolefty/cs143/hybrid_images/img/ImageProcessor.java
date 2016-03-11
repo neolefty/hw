@@ -5,45 +5,31 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.SimpleObjectProperty;
+import org.neolefty.cs143.hybrid_images.ui.ProcessorParam;
 
 import java.awt.image.BufferedImage;
+import java.util.Collection;
 
-/** Processed image -- alters an incoming image. */
-public abstract class ImageProcessor {
+/** Alters an incoming image. */
+public abstract class ImageProcessor implements HasProcessorParams {
     private ReadOnlyObjectWrapper<BufferedImage> processedImage;
 //    private ReadOnlyObjectProperty<BufferedImage> processedImage;
     private SimpleObjectProperty<BufferedImage> unprocessedImage = new SimpleObjectProperty<>();
 
     public ImageProcessor() {
         processedImage = new ReadOnlyObjectWrapper<>();
-//        processedImage = new ReadOnlyObjectWrapper<BufferedImage>() {
-//            private BufferedImage processedImage = null;
-//            @Override
-//            protected void invalidated() {
-//                System.out.println("Processed image - invalidated");
-//                processedImage = null;
-//            }
-//
-//            @Override
-//            public BufferedImage getValue() {
-//                if (processedImage == null)
-//                    processedImage = process(unprocessedImage.getValue());
-//                return processedImage;
-//            }
-//
-//            @Override
-//            public BufferedImage get() {
-//                return getValue();
-//            }
-//        };
-
-//        processedImage.bind(unprocessedImage);
         new ObjectBinding<BufferedImage>() {
             @Override
             protected BufferedImage computeValue() {
                 return process(unprocessedImage.getValue());
             }
         };
+    }
+
+    /** What parameters does this processor have? May be null or empty if none. */
+    @Override
+    public Collection<ProcessorParam> getProcessorParams() {
+        return null;
     }
 
     /** Implement this to do the processing. */

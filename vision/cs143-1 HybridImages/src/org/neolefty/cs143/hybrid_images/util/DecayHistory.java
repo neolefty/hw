@@ -54,7 +54,7 @@ public class DecayHistory<T extends Comparable & Serializable> implements Extern
     private ExecutorService listenerThread = Executors.newSingleThreadExecutor();
     private void notifyListeners() {
         if (inQueue.get() <= 2) // avoid thrashing by having at most one full round of notifications queued
-            listenerThread.submit(() -> {
+            listenerThread.execute(() -> {
                 inQueue.incrementAndGet();
                 for (Listener listener : listeners) listener.changed(this);
                 inQueue.decrementAndGet();

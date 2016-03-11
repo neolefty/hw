@@ -1,9 +1,12 @@
 package org.neolefty.cs143.hybrid_images.img.pixel;
 
+import org.neolefty.cs143.hybrid_images.img.HasProcessorParams;
+import org.neolefty.cs143.hybrid_images.ui.ProcessorParam;
 import org.neolefty.cs143.hybrid_images.util.Stopwatch;
 
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
+import java.util.Collection;
 
 /** Process one pixel at a time. */
 public class UnthreadedPixelProcessor extends SlowPixelProcessor {
@@ -57,5 +60,14 @@ public class UnthreadedPixelProcessor extends SlowPixelProcessor {
                      + " -- " + (1000000 * watch.getElapsed() / (w * h)) + " ns per pixel");
             return accel;
         }
+    }
+
+    @Override
+    public Collection<ProcessorParam> getProcessorParams() {
+        IntToIntFunction f = getPixelFunction();
+        if (f instanceof HasProcessorParams)
+            return ((HasProcessorParams) f).getProcessorParams();
+        else
+            return null;
     }
 }

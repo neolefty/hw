@@ -10,6 +10,7 @@ import org.neolefty.cs143.hybrid_images.ui.ChooseProcessorView;
 import org.neolefty.cs143.hybrid_images.ui.HasBufferedImageProperty;
 import org.neolefty.cs143.hybrid_images.ui.LoadImageView;
 import org.neolefty.cs143.hybrid_images.ui.util.PersistentScene;
+import org.neolefty.cs143.hybrid_images.ui.util.PrefStuff;
 import org.neolefty.cs143.hybrid_images.ui.util.StrictGrid;
 import org.neolefty.cs143.hybrid_images.util.ThrowablePrintingExecutorService;
 
@@ -17,8 +18,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class Main extends Application {
-    private ExecutorService threadPool;
-//    private ExecutorService threadPool = Executors.newSingleThreadExecutor();
+    private ExecutorService processingThreads, uiThreads;
+//    private ExecutorService processingThreads = Executors.newSingleThreadExecutor();
 
     public static void main(String[] args) {
         launch(args);
@@ -26,7 +27,8 @@ public class Main extends Application {
 
     public void start(Stage primaryStage) {
         ExecutorService procThreads = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
-        threadPool = new ThrowablePrintingExecutorService(procThreads);
+        processingThreads = new ThrowablePrintingExecutorService(procThreads);
+        uiThreads = Executors.newFixedThreadPool(20);
 
         primaryStage.setTitle("CS143 #1 Hybrid Images");
 
@@ -72,19 +74,17 @@ public class Main extends Application {
         scene.setExitOnClose(true);
         primaryStage.setScene(scene);
         primaryStage.show();
+    }
 
-        // turn on visual debugging after the initial things have all been submitted
-//        threadPool.submit(() -> {
-//            try { Thread.sleep(3000); } catch (InterruptedException ignored) { }
-//            threadPool.submit(() -> DftFilter.debug = true);
-//        });
+    private PrefStuff getPref(String key) {
+        return new PrefStuff(getClass(), key);
     }
 
     private ChooseProcessorView createFilterChooser
             (HasBufferedImageProperty source, String prefsSuffix)
     {
-        return new ChooseProcessorView(getClass(), "filter " + prefsSuffix,
-                ImageProcessors.list(threadPool), source.bufferedImageProperty(), threadPool);
+        return new ChooseProcessorView(getPref("filter").createChild(prefsSuffix),
+                ImageProcessors.getList(processingThreads), source.imageProperty(), uiThreads);
     }
 
     private void addToGrid(GridPane outer, int w, int h, Node ... nodes) {
