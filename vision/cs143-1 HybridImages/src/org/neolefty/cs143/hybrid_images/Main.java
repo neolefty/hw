@@ -12,23 +12,38 @@ import org.neolefty.cs143.hybrid_images.ui.LoadImageView;
 import org.neolefty.cs143.hybrid_images.ui.util.PersistentScene;
 import org.neolefty.cs143.hybrid_images.ui.util.PrefStuff;
 import org.neolefty.cs143.hybrid_images.ui.util.StrictGrid;
-import org.neolefty.cs143.hybrid_images.util.ThrowablePrintingExecutorService;
+import org.neolefty.cs143.hybrid_images.util.CancellingExecutor;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class Main extends Application {
-    private ExecutorService processingThreads, uiThreads;
-//    private ExecutorService processingThreads = Executors.newSingleThreadExecutor();
+    /** Low-level image-processing Runnables can't be cancelled because they separate the channels and
+     *  wait for all the pieces to complete. If one doesn't, the image processor will wait forever.
+     *  So just let them run to completion. */
+    private ExecutorService lowThreads;
+    /** High-level ImageProcessor runnables can be cancelled though, because nothing depends on them
+     *  and if they never run, it just means that the UI doesn't get updated. */
+    private CancellingExecutor highExec;
 
     public static void main(String[] args) {
         launch(args);
     }
 
     public void start(Stage primaryStage) {
-        ExecutorService procThreads = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
-        processingThreads = new ThrowablePrintingExecutorService(procThreads);
-        uiThreads = Executors.newFixedThreadPool(20);
+        lowThreads = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+
+        int numHighThreads = (Runtime.getRuntime().availableProcessors() / 3) + 1;
+        // Want a low number of threads, since we don't want a ton in flight at a time,
+        // since they'd be mostly waiting for low-level threads.
+        // But want enough to take advantage of all the processors.
+        // Divide by 3 because the most intensive jobs get one task for each color channel
+        ExecutorService highThreads = Executors.newFixedThreadPool(numHighThreads);
+        highExec = new CancellingExecutor(highThreads);
+
+        // if we allow interruption, it actually hurts performance, since the low-level processes
+        // get interrupted and immediately a new one is started
+        highExec.setMayInterrupt(false);
 
         primaryStage.setTitle("CS143 #1 Hybrid Images");
 
@@ -84,7 +99,7 @@ public class Main extends Application {
             (HasBufferedImageProperty source, String prefsSuffix)
     {
         return new ChooseProcessorView(getPref("filter").createChild(prefsSuffix),
-                ImageProcessors.getList(processingThreads), source.imageProperty(), uiThreads);
+                ImageProcessors.getList(lowThreads), source.imageProperty(), highExec);
     }
 
     private void addToGrid(GridPane outer, int w, int h, Node ... nodes) {

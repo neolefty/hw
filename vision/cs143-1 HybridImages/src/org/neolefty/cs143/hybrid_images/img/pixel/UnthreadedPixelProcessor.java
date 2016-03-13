@@ -56,8 +56,8 @@ public class UnthreadedPixelProcessor extends SlowPixelProcessor {
             result.flush();
             watch.mark("copy");
 
-            System.out.println(toString() + ": " + (w * h) + " pixels -- " + watch
-                     + " -- " + (1000000 * watch.getElapsed() / (w * h)) + " ns per pixel");
+//            System.out.println(toString() + ": " + (w * h) + " pixels -- " + watch
+//                     + " -- " + (1000000 * watch.getElapsed() / (w * h)) + " ns per pixel");
             return accel;
         }
     }

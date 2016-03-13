@@ -9,13 +9,11 @@ import javafx.scene.control.Tooltip;
 import org.neolefty.cs143.hybrid_images.img.ImageProcessor;
 import org.neolefty.cs143.hybrid_images.ui.util.PrefStuff;
 import org.neolefty.cs143.hybrid_images.ui.util.ProcessedBI;
-
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import org.neolefty.cs143.hybrid_images.util.CancellingExecutor;
 
 /** Display an image that has been processed, with controls for the processor. */
 public class ProcessedImageView extends StackImageView {
-    private ExecutorService ex;
+    private CancellingExecutor exec;
     private ChangeListener<Number> paramListener;
 
     // when the processor changes, reprocess the current image
@@ -23,11 +21,9 @@ public class ProcessedImageView extends StackImageView {
 
     public ProcessedImageView(PrefStuff pref, ImageProcessor processor,
                               ObjectProperty<ProcessedBI> source,
-                              ExecutorService executorService)
+                              CancellingExecutor exec)
     {
-        if (executorService == null)
-            executorService = Executors.newSingleThreadExecutor();
-        ex = executorService;
+        this.exec = exec;
         processorProperty.addListener((observable, oldValue, newValue) -> {
             // show debug info in tooltip
             Tooltip tip = new Tooltip(newValue == null ? "" : newValue.toString());
@@ -49,9 +45,7 @@ public class ProcessedImageView extends StackImageView {
             setUnprocessedImage(newValue);
         });
 
-        paramListener = (observable, oldValue, newValue) -> {
-            reprocessImage();
-        };
+        paramListener = (observable, oldValue, newValue) -> reprocessImage();
 
         // controls for processor parameters -- at top
         ProcessorControlView controlView = new ProcessorControlView
@@ -82,7 +76,7 @@ public class ProcessedImageView extends StackImageView {
 
     private void setUnprocessedImage(ProcessedBI image) {
         if (image != imageProperty().getValue()) {
-            ex.execute(() -> {
+            exec.submit(this, () -> {
                 ProcessedBI processed = image.process(processorProperty.getValue());
                 imageProperty().set(processed);
             });

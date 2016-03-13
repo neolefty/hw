@@ -109,11 +109,13 @@ public class ThrowablePrintingExecutorService implements ExecutorService {
         try {
             int inQueue = tpe.getQueue().size();
             tpe.purge();
-            int purged = tpe.getQueue().size() - inQueue;
+            int purged = inQueue - tpe.getQueue().size();
 
-            System.out.println("Enter " + x + " >> Queue = " + inQueue + "; purged = " + purged
-                    + "; Active = " + tpe.getActiveCount() + "(" + currentlyRunning.size() + ") >> "
-                    + command.getClass().getName());
+            if (tpe.getMaximumPoolSize() == tpe.getActiveCount() || purged > 0)
+                System.out.println("Enter " + x + " >> Queue = " + inQueue + "; purged = " + purged
+                        + "; Active = " + tpe.getActiveCount() + "(" + currentlyRunning.size() + ") >> "
+                        + command.getClass().getName());
+
             wrapped.execute(() -> {
                 currentlyRunning.add(command);
                 command.run();
@@ -126,7 +128,7 @@ public class ThrowablePrintingExecutorService implements ExecutorService {
                     + "(" + currentlyRunning.size() + ") ** " + command.getClass().getName());
             throw t;
         }
-        System.out.println("Exit " + x + " << Active = " + tpe.getActiveCount()
-                + "(" + currentlyRunning.size() + ") << " + command.getClass().getName());
+//        System.out.println("Exit " + x + " << Active = " + tpe.getActiveCount()
+//                + "(" + currentlyRunning.size() + ") << " + command.getClass().getName());
     }
 }

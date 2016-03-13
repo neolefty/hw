@@ -14,31 +14,21 @@ import org.neolefty.cs143.hybrid_images.util.Stopwatch;
 import javax.swing.*;
 import java.awt.image.BufferedImage;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 
 /** Convert to BoofCV MultiSpectral ImageUInt8 and do something. Uses ThreadPool to process RGB bands separately. */
 public class Boof8Processor extends ImageProcessor implements HasDebugWindow {
+    private final ExecutorService exec;
     private Function function;
-    private ExecutorService threadPool;
     private ReadOnlyObjectWrapper<JComponent> debugWindowProperty = new ReadOnlyObjectWrapper<>();
 
-    public Boof8Processor(Function function, ExecutorService threadPool) {
+    public Boof8Processor(Function function, ExecutorService exec) {
         this.function = function;
         if (function != null && function instanceof HasDebugWindow)
             debugWindowProperty.bind(((HasDebugWindow) function).debugWindowProperty());
-        if (threadPool == null)
-            threadPool = Executors.newSingleThreadExecutor();
-        this.threadPool = threadPool;
+        this.exec = exec;
     }
-
-    // the operations that are unresolved
-    private final Set<Future> inFlight = Collections.synchronizedSet(new HashSet<>());
 
     @Override
     public BufferedImage process(BufferedImage original) {
@@ -54,47 +44,32 @@ public class Boof8Processor extends ImageProcessor implements HasDebugWindow {
             MultiSpectral<ImageUInt8> processed = new MultiSpectral<>(ImageUInt8.class, w, h, 3);
             CountDownLatch latch = new CountDownLatch(3); // could use ExecutorService.invokeAll() instead
 
-            // cancel any stale operations
-            synchronized (inFlight) {
-                if (!inFlight.isEmpty())
-                    System.out.println(inFlight.size() + " in flight -- " + toString());
-                while (!inFlight.isEmpty()) {
-                    Future f = inFlight.iterator().next();
-                    f.cancel(false);
-                    inFlight.remove(f);
-                }
-//                inFlight.removeIf(future -> { // this seems clever enough to be confusing
-//                    future.cancel(true);
-//                    return true;
-//                });
-            }
-
-            Future[] futures = new Future[3];
             for (int i = 0; i < 3; ++i) {
                 final int finalI = i;
-                futures[i] = threadPool.submit(() -> {
+                exec.execute(() -> {
                     try {
                         function.apply(boofImage.getBand(finalI), processed.getBand(finalI), finalI);
                         watch.mark("band " + finalI);
-                    } catch(Exception e) {
-                        e.printStackTrace();
                     } finally {
                         latch.countDown();
-                        inFlight.remove(futures[finalI]);
                     }
                 });
-                inFlight.add(futures[i]);
             }
 
             // wait for all to complete
-            latch.await();
+            try {
+                latch.await();
 
-            BufferedImage result = ConvertBufferedImage.convertTo(processed, null, true);
-            watch.mark("convert back");
-            double nsPerPixel = (watch.getElapsed() * 1000000) / (w * h);
-            System.out.println(toString() + " - " + watch + " - " + nsPerPixel + " ns per pixel"
-                    + " - " + w + "x" + h + " " + toString());
-            return result;
+                BufferedImage result = ConvertBufferedImage.convertTo(processed, null, true);
+                watch.mark("convert back");
+//            double nsPerPixel = (watch.getElapsed() * 1000000) / (w * h);
+//            System.out.println(toString() + " - " + watch + " - " + nsPerPixel + " ns per pixel"
+//                    + " - " + w + "x" + h + " " + toString());
+                return result;
+            } catch(InterruptedException ignored) {
+                System.out.print(".");
+                return original;
+            }
         } catch(Exception e) {
             e.printStackTrace();
             return null;

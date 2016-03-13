@@ -9,16 +9,16 @@ import java.util.concurrent.ExecutorService;
 
 /** Multithreaded pixel processor. */
 public class PixelProcessor extends UnthreadedPixelProcessor {
-    private ExecutorService threadPool;
+    private ExecutorService exec;
     private int nPieces;
 
-    public PixelProcessor(IntToIntFunction pixelFunction, ExecutorService threadPool) {
-        this(pixelFunction, threadPool, Runtime.getRuntime().availableProcessors());
+    public PixelProcessor(IntToIntFunction pixelFunction, ExecutorService exec) {
+        this(pixelFunction, exec, Runtime.getRuntime().availableProcessors());
     }
 
-    public PixelProcessor(IntToIntFunction pixelFunction, ExecutorService executorService, int nPieces) {
+    public PixelProcessor(IntToIntFunction pixelFunction, ExecutorService exec, int nPieces) {
         super(pixelFunction);
-        this.threadPool = executorService;
+        this.exec = exec;
         this.nPieces = nPieces;
     }
 
@@ -45,7 +45,7 @@ public class PixelProcessor extends UnthreadedPixelProcessor {
                 // from a to b-1; ensure that we go right up to the end
                 final int a = i * chunk, b = (i == nPieces - 1 ? work.length : a + chunk);
                 final int finalI = i;
-                threadPool.execute(() -> {
+                exec.execute(() -> {
                     for (int j = a; j < b; ++j)
                         work[j] = getPixelFunction().apply(work[j]);
                     if (latch.getCount() == nPieces)
@@ -53,19 +53,23 @@ public class PixelProcessor extends UnthreadedPixelProcessor {
                     latch.countDown();
                 });
             }
-            try { latch.await(); } catch (InterruptedException e) { e.printStackTrace(); }
+            try {
+                latch.await();
+                watch.mark("lag");
+                copy.flush();
 
-            watch.mark("lag");
-            copy.flush();
+                BufferedImage accel = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
+                accel.getGraphics().drawImage(copy, 0, 0, null);
+                copy.flush();
+                watch.mark("copy");
 
-            BufferedImage accel = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
-            accel.getGraphics().drawImage(copy, 0, 0, null);
-            copy.flush();
-            watch.mark("copy");
-
-            System.out.println(toString() + " - " + (w * h) + " pixels - " + watch
-                     + " -- " + (1000000 * watch.getElapsed() / (w * h)) + " ns per pixel - " + toString());
-            return accel;
+//            System.out.println(toString() + " - " + (w * h) + " pixels - " + watch
+//                     + " -- " + (1000000 * watch.getElapsed() / (w * h)) + " ns per pixel - " + toString());
+                return accel;
+            } catch (InterruptedException ignored) {
+                System.out.print(",");
+                return original; // processing was interrupted, so leave it the same
+            }
         }
     }
 }

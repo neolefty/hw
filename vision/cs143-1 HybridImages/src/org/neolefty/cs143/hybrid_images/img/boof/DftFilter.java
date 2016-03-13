@@ -86,7 +86,7 @@ public class DftFilter implements Boof8Processor.Function, HasDebugWindow {
             watch.mark("visualize");
         }
 
-        System.out.println(" --> " + watch);
+//        System.out.println(" --> " + watch);
     }
 
     @Override
