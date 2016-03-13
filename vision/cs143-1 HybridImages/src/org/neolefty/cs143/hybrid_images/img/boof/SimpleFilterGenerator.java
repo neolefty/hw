@@ -1,4 +1,4 @@
-package org.neolefty.cs143.hybrid_images.img;
+package org.neolefty.cs143.hybrid_images.img.boof;
 
 import boofcv.alg.filter.blur.BlurImageOps;
 import boofcv.alg.misc.PixelMath;

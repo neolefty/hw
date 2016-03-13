@@ -1,4 +1,6 @@
-package org.neolefty.cs143.hybrid_images.img;
+package org.neolefty.cs143.hybrid_images.img.geom;
+
+import org.neolefty.cs143.hybrid_images.img.ImageProcessor;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;

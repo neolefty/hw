@@ -2,6 +2,7 @@ package org.neolefty.cs143.hybrid_images.ui;
 
 import com.sun.javafx.collections.ObservableListWrapper;
 import javafx.scene.control.ComboBox;
+import org.neolefty.cs143.hybrid_images.ui.util.FileHistoryMenu;
 
 import java.util.List;
 import java.util.stream.Collectors;

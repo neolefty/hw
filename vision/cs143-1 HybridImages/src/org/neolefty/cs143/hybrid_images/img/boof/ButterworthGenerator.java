@@ -1,4 +1,4 @@
-package org.neolefty.cs143.hybrid_images.img;
+package org.neolefty.cs143.hybrid_images.img.boof;
 
 import boofcv.struct.image.ImageFloat32;
 import org.neolefty.cs143.hybrid_images.ui.ProcessorParam;

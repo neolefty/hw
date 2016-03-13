@@ -2,6 +2,7 @@ package org.neolefty.cs143.hybrid_images.ui;
 
 import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyObjectProperty;
+import org.neolefty.cs143.hybrid_images.ui.ProcessorParam;
 import org.neolefty.cs143.hybrid_images.ui.util.PrefStuff;
 import org.neolefty.cs143.hybrid_images.ui.util.ProcessedBI;
 

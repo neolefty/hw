@@ -5,7 +5,7 @@ import javafx.scene.Node;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 import org.neolefty.cs143.hybrid_images.img.ImageProcessors;
-import org.neolefty.cs143.hybrid_images.img.ImageShrinker;
+import org.neolefty.cs143.hybrid_images.img.geom.ImageShrinker;
 import org.neolefty.cs143.hybrid_images.ui.ChooseProcessorView;
 import org.neolefty.cs143.hybrid_images.ui.HasBufferedImageProperty;
 import org.neolefty.cs143.hybrid_images.ui.LoadImageView;

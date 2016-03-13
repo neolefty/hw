@@ -1,7 +1,7 @@
-package org.neolefty.cs143.hybrid_images.ui;
+package org.neolefty.cs143.hybrid_images.ui.util;
 
 /** Used to abbreviate items in a file history list but retain the full path behind the scenes. */
-class FilenameShortener {
+public class FilenameShortener {
     private String abbrev, verbose;
 
     public FilenameShortener(String abbrev, String verbose) {

@@ -1,9 +1,6 @@
 package org.neolefty.cs143.hybrid_images.img;
 
-import org.neolefty.cs143.hybrid_images.img.boof.Boof8Processor;
-import org.neolefty.cs143.hybrid_images.img.boof.DftFilter;
-import org.neolefty.cs143.hybrid_images.img.boof.FftUInt8;
-import org.neolefty.cs143.hybrid_images.img.boof.GaussBlur8;
+import org.neolefty.cs143.hybrid_images.img.boof.*;
 import org.neolefty.cs143.hybrid_images.img.pixel.*;
 
 import java.util.Arrays;

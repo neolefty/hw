@@ -11,8 +11,6 @@ import boofcv.struct.image.ImageUInt8;
 import boofcv.struct.image.InterleavedF32;
 import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.ReadOnlyObjectWrapper;
-import org.neolefty.cs143.hybrid_images.img.FilterGenerator;
-import org.neolefty.cs143.hybrid_images.img.Image32Generator;
 import org.neolefty.cs143.hybrid_images.ui.HasDebugWindow;
 import org.neolefty.cs143.hybrid_images.ui.ProcessorParam;
 import org.neolefty.cs143.hybrid_images.util.Stopwatch;

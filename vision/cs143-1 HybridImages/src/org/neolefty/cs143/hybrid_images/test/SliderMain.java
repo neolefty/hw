@@ -15,7 +15,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
-import org.neolefty.cs143.hybrid_images.img.ImageShrinker;
+import org.neolefty.cs143.hybrid_images.img.geom.ImageShrinker;
 import org.neolefty.cs143.hybrid_images.util.ImageIOKit;
 
 import java.awt.image.BufferedImage;
