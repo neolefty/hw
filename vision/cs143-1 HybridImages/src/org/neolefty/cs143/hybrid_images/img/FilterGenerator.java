@@ -15,7 +15,7 @@ public abstract class FilterGenerator implements Image32Generator {
 
     // how much of the FFT area do we remove? 0 to 1
     private ProcessorParam fraction = new ProcessorParam
-            ("fraction", 0.2, -5, 5,
+            ("fraction", 0.2, -1, 1,
                     "How strong is the filter? Negative for high-pass, positive for low-pass.");
 
     private List<ProcessorParam> params = Collections.singletonList(fraction);

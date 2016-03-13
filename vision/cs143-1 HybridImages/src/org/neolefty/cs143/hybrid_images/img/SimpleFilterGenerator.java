@@ -11,7 +11,7 @@ import java.awt.image.BufferedImage;
 
 /** Generates simple FFT filter images, optionally with a Gaussian blur to reduce ringing. */
 public class SimpleFilterGenerator extends FilterGenerator {
-    private ProcessorParam filterBlur = new ProcessorParam("filter blur", 1, 0, 10,
+    private ProcessorParam filterBlur = new ProcessorParam("filter blur", 1, 0, 8,
             "Blurring the filter reduces ringing. Higher number = less blurring, more ringing."
                     + " 0 = no blurring, maximum ringing.");
 

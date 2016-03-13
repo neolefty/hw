@@ -27,7 +27,7 @@ public class ProcessorControlView extends VBox {
         if (value != null && value.getProcessorParams() != null) {
             for (ProcessorParam param : value.getProcessorParams()) {
                 getChildren().add(new ParamSlider(param));
-                new ParameterSaver(pref, param, imageProperty, param.getDefault());
+                new ParameterSaver(pref.createChild(param.getName()), param, imageProperty, param.getDefault());
             }
         }
     }

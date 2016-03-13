@@ -3,15 +3,14 @@ package org.neolefty.cs143.hybrid_images.img.pixel;
 import org.neolefty.cs143.hybrid_images.img.HasProcessorParams;
 import org.neolefty.cs143.hybrid_images.ui.ProcessorParam;
 
-import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 /** A simple dimmer. */
 public class Dimmer implements IntToIntFunction, HasProcessorParams {
     private ProcessorParam brightParam = new ProcessorParam("bright", 0.5, 0, 2, "Dimmer's brightness.");
-    private ProcessorParam dummyParam = new ProcessorParam("dummy", 1, 0, 10, "Dummy parameter.");
-    private List<ProcessorParam> params = Arrays.asList(brightParam, dummyParam);
+    private List<ProcessorParam> params = Collections.singletonList(brightParam);
     private int bright = 127; // 0 to 255
 
     public Dimmer() {
