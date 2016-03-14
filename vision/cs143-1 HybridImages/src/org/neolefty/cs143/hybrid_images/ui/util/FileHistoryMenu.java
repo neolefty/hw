@@ -12,7 +12,6 @@ import java.util.List;
 
 /** A dropdown menu showing a {@link DecayHistory} of files.
  *  Assumes that whenever a file is selected, it will be added to the history externally. */
-// TODO update when image changed interactively -- not important enough for now
 public class FileHistoryMenu extends ComboBox<FilenameShortener> {
     private ObservableListWrapper<FilenameShortener> items;
     public static final int DISPLAY_COUNT = 15;

@@ -49,7 +49,9 @@ public class SliderMain extends Application {
             BufferedImage bi = ImageIOKit.loadImage(new File
                     ("R:\\Cloud\\Family Library\\photos\\2008\\4 Oct-Dec\\2008_10_26 Green Chair"
                             + "\\20081026_girls on green chair_03.JPG"));
-            bi = new ImageShrinker(512*512).process(bi);
+            ImageShrinker shrink = new ImageShrinker();
+            shrink.setSize(512);
+            bi = shrink.process(bi);
             image = SwingFXUtils.toFXImage(bi, null);
         } catch (IOException e) {
             e.printStackTrace();

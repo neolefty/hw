@@ -9,13 +9,22 @@ public class ProcessorParam extends ReadOnlyDoubleWrapper {
     private String comment;
     private boolean integer;
 
+    /** Construct a non-integer parameter. */
     public ProcessorParam(String name, double def, double min, double max, String comment) {
+        this(name, def, min, max, false, comment);
+    }
+
+    /** Construct a parameter. */
+    public ProcessorParam
+        (String name, double def, double min, double max, boolean integer, String comment)
+    {
         super(def);
-        this.comment = comment;
-        this.min = min;
-        this.max = max;
         this.name = name;
         this.def = def;
+        this.min = min;
+        this.max = max;
+        this.integer = integer;
+        this.comment = comment;
         set(def);
     }
 

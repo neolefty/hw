@@ -14,7 +14,6 @@ public class ButterworthGenerator extends FilterGenerator {
         super.addParam(order);
     }
 
-    // TODO: consider using a thread pool
     @Override
     public ImageFloat32 generate(int w, int h) {
 // How to hack these so that odd works? Maybe two separate values, half & halfMinus1?

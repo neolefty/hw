@@ -8,7 +8,7 @@ import org.neolefty.cs143.hybrid_images.img.ImageProcessors;
 import org.neolefty.cs143.hybrid_images.img.geom.ImageShrinker;
 import org.neolefty.cs143.hybrid_images.ui.ChooseProcessorView;
 import org.neolefty.cs143.hybrid_images.ui.HasBufferedImageProperty;
-import org.neolefty.cs143.hybrid_images.ui.LoadImageView;
+import org.neolefty.cs143.hybrid_images.ui.ChooseFileImageView;
 import org.neolefty.cs143.hybrid_images.ui.util.PersistentScene;
 import org.neolefty.cs143.hybrid_images.ui.util.PrefStuff;
 import org.neolefty.cs143.hybrid_images.ui.util.StrictGrid;
@@ -57,8 +57,8 @@ public class Main extends Application {
     }
 
     private void reallyStart(Stage primaryStage) {
-        LoadImageView left = new LoadImageView(getClass(), "left");
-        LoadImageView right = new LoadImageView(getClass(), "right");
+        ChooseFileImageView left = new ChooseFileImageView(getClass(), "left");
+        ChooseFileImageView right = new ChooseFileImageView(getClass(), "right");
         left.setPreprocessor(new ImageShrinker());
         right.setPreprocessor(new ImageShrinker());
 

@@ -9,7 +9,7 @@ import java.util.List;
 
 /** A simple dimmer. */
 public class Dimmer implements IntToIntFunction, HasProcessorParams {
-    private ProcessorParam brightParam = new ProcessorParam("bright", 0.5, 0, 2, "Dimmer's brightness.");
+    private ProcessorParam brightParam = new ProcessorParam("bright", 1, 0, 4, "Dimmer's brightness.");
     private List<ProcessorParam> params = Collections.singletonList(brightParam);
     private int bright = 127; // 0 to 255
 

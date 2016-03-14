@@ -1,25 +1,22 @@
 package org.neolefty.cs143.hybrid_images.img.geom;
 
 import org.neolefty.cs143.hybrid_images.img.ImageProcessor;
+import org.neolefty.cs143.hybrid_images.ui.ProcessorParam;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.util.*;
 
-// TODO parameterize
 /** Scale down an image if it is too large */
 public class ImageShrinker extends ImageProcessor {
-    private int maxPixels;
-
-    public ImageShrinker(int maxPixels) {
-        this.maxPixels = maxPixels;
-    }
-
-    /** Shrink to have no more than 512 * 512 pixels. */
-    public ImageShrinker() { this(512 * 512); }
+    private ProcessorParam size = new ProcessorParam("size", 512, 128, 2048, true,
+            "Resized dimension -- geometric average of h & w.");
+    private java.util.List<ProcessorParam> params = Collections.singletonList(size);
 
     @Override
     public BufferedImage process(BufferedImage original) {
         int w = original.getWidth(), h = original.getHeight();
+        int maxPixels = (int) (size.doubleValue() * size.doubleValue());
         if (w * h <= maxPixels)
             return original;
         else {
@@ -31,5 +28,11 @@ public class ImageShrinker extends ImageProcessor {
             g.drawImage(original, 0, 0, null);
             return result;
         }
+    }
+
+    /** Set the size of this image. The geometric average of the height and
+     *  width will be close to <tt>sideSize</tt>. */
+    public void setSize(int sideSize) {
+        size.setValue(sideSize);
     }
 }

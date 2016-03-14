@@ -9,7 +9,6 @@ import javafx.scene.control.Button;
 import javafx.scene.layout.FlowPane;
 import javafx.stage.FileChooser;
 import org.neolefty.cs143.hybrid_images.img.ImageProcessor;
-import org.neolefty.cs143.hybrid_images.ui.StackImageView;
 import org.neolefty.cs143.hybrid_images.ui.util.FileHistoryMenu;
 import org.neolefty.cs143.hybrid_images.ui.util.FilenameShortener;
 import org.neolefty.cs143.hybrid_images.ui.util.ProcessedBI;
@@ -22,7 +21,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 /** Loads a BufferedImage interactively. */
-public class LoadImageView extends StackImageView {
+public class ChooseFileImageView extends StackImageView {
     private Class prefsClass;
     private String prefsFileHistoryKey;
     private DecayHistory<String> fileHistory;
@@ -32,7 +31,7 @@ public class LoadImageView extends StackImageView {
 
     private static final String PREFS_FILE_HISTORY = "file_history";
 
-    public LoadImageView(Class prefsClass, String prefsSuffix) {
+    public ChooseFileImageView(Class prefsClass, String prefsSuffix) {
         this.prefsClass = prefsClass;
         this.prefsFileHistoryKey = PREFS_FILE_HISTORY + "_" + prefsSuffix;
         //noinspection unchecked

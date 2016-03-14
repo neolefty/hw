@@ -10,7 +10,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
 
-// TODO send change events via JavaFX's way
 /** An exponentially decaying history. Good for files?
  *  When you add an item, all current weights decay, and the new item's weight is increased by 1. */
 public class DecayHistory<T extends Comparable & Serializable> implements Externalizable {
@@ -42,7 +41,6 @@ public class DecayHistory<T extends Comparable & Serializable> implements Extern
         return new ArrayList<>(weightMap.values());
     }
 
-    // TODO extract into helper or super class, or maybe just use ObjectWrapper
     public interface Listener { void changed(DecayHistory h); }
 
     private Set<Listener> listeners = new HashSet<>();

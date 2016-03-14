@@ -18,14 +18,17 @@ public class ChooseProcessorView extends ProcessedImageView {
     {
         super(pref, null, source, uiExec);
         ImageProcessorHistory history = new ImageProcessorHistory(pref, processors);
-        ImageProcessorMenu menu = new ImageProcessorMenu(history);
-
-        FlowPane controls = new FlowPane();
-        controls.setAlignment(Pos.BOTTOM_CENTER);
-        controls.getChildren().add(menu);
-        menu.valueProperty().addListener((observable, oldValue, newValue) -> setImageProcessor(newValue.getProcessor()));
         setImageProcessor(history.getTop());
-        if (getControlPane().getBottom() != null) throw new IllegalStateException();
-        getControlPane().setBottom(controls);
+
+        if (processors.size() > 1) {
+            ImageProcessorMenu menu = new ImageProcessorMenu(history);
+            menu.valueProperty().addListener((observable, oldValue, newValue) -> setImageProcessor(newValue.getProcessor()));
+            // place the menu at the bottom
+            FlowPane controls = new FlowPane();
+            controls.setAlignment(Pos.BOTTOM_CENTER);
+            controls.getChildren().add(menu);
+            if (getControlPane().getBottom() != null) throw new IllegalStateException();
+            getControlPane().setBottom(controls);
+        }
     }
 }
