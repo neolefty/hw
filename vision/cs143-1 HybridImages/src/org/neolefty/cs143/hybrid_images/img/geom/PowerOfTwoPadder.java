@@ -4,6 +4,7 @@ import org.neolefty.cs143.hybrid_images.img.ImageProcessor;
 import org.neolefty.cs143.hybrid_images.util.Stopwatch;
 
 import java.awt.image.BufferedImage;
+import java.util.Collection;
 
 /** Pad images so that their dimensions are a power of 2. */
 public class PowerOfTwoPadder extends ImageProcessor {
@@ -12,8 +13,10 @@ public class PowerOfTwoPadder extends ImageProcessor {
     public PowerOfTwoPadder(boolean square) { this.square = square; }
 
     @Override
-    public BufferedImage process(BufferedImage original) {
+    public BufferedImage process(Collection<BufferedImage> originals) {
+        checkImageCount(originals.size(), 1, 1);
         Stopwatch watch = new Stopwatch();
+        BufferedImage original = originals.iterator().next();
         BufferedImage result = PowerOfTwo.pad(original, square);
         System.out.println("Pad " + original.getWidth() + "x" + original.getHeight()
                 + " to " + result.getWidth() + "x" + result.getHeight() + ": " + watch);

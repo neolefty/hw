@@ -14,15 +14,15 @@ import java.util.Collection;
 public class ChooseProcessorView extends ProcessedImageView {
     public ChooseProcessorView
             (PrefStuff pref, Collection<ImageProcessor> processors,
-             ObjectProperty<ProcessedBI> source, CancellingExecutor uiExec)
+             Collection<ObjectProperty<ProcessedBI>> sources, CancellingExecutor uiExec)
     {
-        super(pref, null, source, uiExec);
+        super(pref, null, sources, uiExec);
         ImageProcessorHistory history = new ImageProcessorHistory(pref, processors);
-        setImageProcessor(history.getTop());
+        setProcessor(history.getTop());
 
         if (processors.size() > 1) {
             ImageProcessorMenu menu = new ImageProcessorMenu(history);
-            menu.valueProperty().addListener((observable, oldValue, newValue) -> setImageProcessor(newValue.getProcessor()));
+            menu.valueProperty().addListener((observable, oldValue, newValue) -> setProcessor(newValue.getProcessor()));
             // place the menu at the bottom
             FlowPane controls = new FlowPane();
             controls.setAlignment(Pos.BOTTOM_CENTER);

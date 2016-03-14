@@ -79,7 +79,7 @@ public class ChooseFileImageView extends StackImageView {
             return topName == null ? null : new File(topName);
         }
         else
-            return pbi.getFile();
+            return pbi.getFirstFile();
     }
 
     /** Either the current file's directory or the top one in history. */

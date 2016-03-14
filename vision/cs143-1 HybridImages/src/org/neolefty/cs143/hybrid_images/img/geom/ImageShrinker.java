@@ -14,7 +14,9 @@ public class ImageShrinker extends ImageProcessor {
     private java.util.List<ProcessorParam> params = Collections.singletonList(size);
 
     @Override
-    public BufferedImage process(BufferedImage original) {
+    public BufferedImage process(Collection<BufferedImage> originals) {
+        checkImageCount(originals.size(), 1, 1);
+        BufferedImage original = originals.iterator().next();
         int w = original.getWidth(), h = original.getHeight();
         int maxPixels = (int) (size.doubleValue() * size.doubleValue());
         if (w * h <= maxPixels)

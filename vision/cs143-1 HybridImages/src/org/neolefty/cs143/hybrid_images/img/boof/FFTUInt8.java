@@ -12,7 +12,7 @@ import org.neolefty.cs143.hybrid_images.ui.ProcessorParam;
 import java.util.Collection;
 
 /** FFT of an image. Works best if x & y are powers of 2. */
-public class FftUInt8 implements Boof8Processor.Function {
+public class FftUInt8 extends SingleInputBoof8Function {
     public enum Part { magnitude, phase }
 
     private Part part;

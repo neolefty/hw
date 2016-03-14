@@ -11,41 +11,60 @@ import org.neolefty.cs143.hybrid_images.ui.util.PrefStuff;
 import org.neolefty.cs143.hybrid_images.ui.util.ProcessedBI;
 import org.neolefty.cs143.hybrid_images.util.CancellingExecutor;
 
+import javax.swing.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
 /** Display an image that has been processed, with controls for the processor. */
 public class ProcessedImageView extends StackImageView {
     private CancellingExecutor exec;
     private ChangeListener<Number> paramListener;
+    Collection<ObjectProperty<ProcessedBI>> sources;
+
+    Tooltip tip = new Tooltip();
+    private ChangeListener<JComponent> debugVisualListener = (observable, oldValue, newValue) -> {
+        SwingNode node = new SwingNode();
+        node.setContent(newValue);
+        Platform.runLater(() -> tip.graphicProperty().setValue(node));
+    };
 
     // when the processor changes, reprocess the current image
     private ReadOnlyObjectWrapper<ImageProcessor> processorProperty = new ReadOnlyObjectWrapper<>();
 
     public ProcessedImageView(PrefStuff pref, ImageProcessor processor,
-                              ObjectProperty<ProcessedBI> source,
+                              Collection<ObjectProperty<ProcessedBI>> sources,
                               CancellingExecutor exec)
     {
         this.exec = exec;
+        this.sources = sources;
+        Tooltip.install(this, tip);
+
+        // whenever the processor is changed ...
         processorProperty.addListener((observable, oldValue, newValue) -> {
-            // show debug info in tooltip
-            Tooltip tip = new Tooltip(newValue == null ? "" : newValue.toString());
-            if (newValue != null && newValue instanceof HasDebugWindow) {
-                SwingNode node = new SwingNode();
-                ((HasDebugWindow) newValue).debugWindowProperty().addListener((obsDebug, oldDebug, newDebug) -> {
-                    node.setContent(newDebug);
-                    Platform.runLater(() -> tip.graphicProperty().setValue(node));
-                });
-            }
-            Tooltip.install(this, tip);
-
-            reprocessImage();
+            // ... update the tooltip ...
+            tip.setText(newValue == null ? "" : newValue.toString());
+            if (oldValue != null && oldValue instanceof HasDebugWindow)
+                ((HasDebugWindow) oldValue).debugWindowProperty().removeListener(debugVisualListener);
+            if (newValue != null && newValue instanceof HasDebugWindow)
+                ((HasDebugWindow) newValue).debugWindowProperty().addListener(debugVisualListener);
+            else // doesn't have graphical debug info, so clear out the old one
+                Platform.runLater(() -> tip.graphicProperty().setValue(null));
+            // ... and reprocess the current inputs
+            reprocess();
         });
 
-        setImageProcessor(processor);
+        // initialize the processor
+        setProcessor(processor);
 
-        source.addListener((observable, oldValue, newValue) -> {
-            setUnprocessedImage(newValue);
-        });
+        // whenever an input is changed, reprocess
+        for (ObjectProperty<ProcessedBI> source : sources)
+            source.addListener((observable, oldValue, newValue) -> {
+                reprocess();
+            });
 
-        paramListener = (observable, oldValue, newValue) -> reprocessImage();
+        // parameters changed: reprocess inputs
+        paramListener = (observable, oldValue, newValue) -> reprocess();
 
         // controls for processor parameters -- at top
         ProcessorControlView controlView = new ProcessorControlView
@@ -54,13 +73,23 @@ public class ProcessedImageView extends StackImageView {
         getControlPane().setTop(controlView);
     }
 
-    /** reprocess the current image */
-    private void reprocessImage() {
-        ProcessedBI processed = imageProperty().getValue();
-        setUnprocessedImage(processed == null ? null : processed.getPredecessor());
+    /** Reprocess the current inputs and update the output image. */
+    private void reprocess() {
+        exec.submit(this, () -> {
+            setImage(ProcessedBI.process(getProcessor(), getInputs()));
+        });
     }
 
-    public void setImageProcessor(ImageProcessor processor) {
+    public List<ProcessedBI> getInputs() {
+        List<ProcessedBI> result = new ArrayList<>();
+        for (ObjectProperty<ProcessedBI> source : sources)
+            result.add(source.get());
+        return result;
+    }
+
+    public ImageProcessor getProcessor() { return processorProperty.getValue(); }
+
+    public void setProcessor(ImageProcessor processor) {
         // stop listening to the old processor's parameters
         ImageProcessor oldP = processorProperty.getValue();
         if (oldP != null && oldP.getProcessorParams() != null)
@@ -72,14 +101,5 @@ public class ProcessedImageView extends StackImageView {
         if (processor != null && processor.getProcessorParams() != null)
             for (ProcessorParam param : processor.getProcessorParams())
                 param.addListener(paramListener);
-    }
-
-    private void setUnprocessedImage(ProcessedBI image) {
-        if (image != imageProperty().getValue()) {
-            exec.submit(this, () -> {
-                ProcessedBI processed = image.process(processorProperty.getValue());
-                imageProperty().set(processed);
-            });
-        }
     }
 }

@@ -6,14 +6,15 @@ import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 import org.neolefty.cs143.hybrid_images.img.ImageProcessors;
 import org.neolefty.cs143.hybrid_images.img.geom.ImageShrinker;
+import org.neolefty.cs143.hybrid_images.ui.ChooseFileImageView;
 import org.neolefty.cs143.hybrid_images.ui.ChooseProcessorView;
 import org.neolefty.cs143.hybrid_images.ui.HasBufferedImageProperty;
-import org.neolefty.cs143.hybrid_images.ui.ChooseFileImageView;
 import org.neolefty.cs143.hybrid_images.ui.util.PersistentScene;
 import org.neolefty.cs143.hybrid_images.ui.util.PrefStuff;
 import org.neolefty.cs143.hybrid_images.ui.util.StrictGrid;
 import org.neolefty.cs143.hybrid_images.util.CancellingExecutor;
 
+import java.util.Collections;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -98,8 +99,11 @@ public class Main extends Application {
     private ChooseProcessorView createFilterChooser
             (HasBufferedImageProperty source, String prefsSuffix)
     {
-        return new ChooseProcessorView(getPref("filter").createChild(prefsSuffix),
-                ImageProcessors.getList(lowThreads), source.imageProperty(), highExec);
+        return new ChooseProcessorView(
+                getPref("filter").createChild(prefsSuffix),
+                ImageProcessors.getList(lowThreads),
+                Collections.singleton(source.imageProperty()),
+                highExec);
     }
 
     private void addToGrid(GridPane outer, int w, int h, Node ... nodes) {

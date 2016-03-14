@@ -23,7 +23,7 @@ public class PixelProcessor extends UnthreadedPixelProcessor {
     }
 
     @Override
-    public BufferedImage process(BufferedImage original) {
+    public BufferedImage processSingle(BufferedImage original) {
         if (original == null)
             return null;
         else {

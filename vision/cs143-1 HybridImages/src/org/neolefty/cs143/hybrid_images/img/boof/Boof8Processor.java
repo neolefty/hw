@@ -13,7 +13,9 @@ import org.neolefty.cs143.hybrid_images.util.Stopwatch;
 
 import javax.swing.*;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 
@@ -31,24 +33,35 @@ public class Boof8Processor extends ImageProcessor implements HasDebugWindow {
     }
 
     @Override
-    public BufferedImage process(BufferedImage original) {
+    public BufferedImage process(Collection<BufferedImage> originals) {
         Stopwatch watch = new Stopwatch();
         try {
-            int w = original.getWidth(), h = original.getHeight();
+            List<MultiSpectral<ImageUInt8>> boofIns = new ArrayList<>();
+            int maxW = 0, maxH = 0;
+            for (BufferedImage original : originals) {
+                int w = original.getWidth(), h = original.getHeight();
+                maxW = Math.max(w, maxW);
+                maxH = Math.max(h, maxH);
+                int bands = original.getRaster().getNumBands();
+                MultiSpectral<ImageUInt8> boofImage = new MultiSpectral<>(ImageUInt8.class, w, h, bands);
+                ConvertBufferedImage.convertFrom(original, boofImage, true);
+                boofIns.add(boofImage);
+            }
 
-            int bands = original.getRaster().getNumBands();
-            MultiSpectral<ImageUInt8> boofImage = new MultiSpectral<>(ImageUInt8.class, w, h, bands);
-            ConvertBufferedImage.convertFrom(original, boofImage, true);
             watch.mark("convert to boof");
 
-            MultiSpectral<ImageUInt8> processed = new MultiSpectral<>(ImageUInt8.class, w, h, 3);
+            MultiSpectral<ImageUInt8> processed = new MultiSpectral<>(ImageUInt8.class, maxW, maxH, 3);
             CountDownLatch latch = new CountDownLatch(3); // could use ExecutorService.invokeAll() instead
 
             for (int i = 0; i < 3; ++i) {
                 final int finalI = i;
                 exec.execute(() -> {
                     try {
-                        function.apply(boofImage.getBand(finalI), processed.getBand(finalI), finalI);
+                        // one band at a time, across all inputs
+                        List<ImageUInt8> bandInputs = new ArrayList<ImageUInt8>();
+                        for (MultiSpectral<ImageUInt8> multiIn : boofIns)
+                            bandInputs.add(multiIn.getBand(finalI));
+                        function.apply(bandInputs, processed.getBand(finalI), finalI);
                         watch.mark("band " + finalI);
                     } finally {
                         latch.countDown();
@@ -68,7 +81,7 @@ public class Boof8Processor extends ImageProcessor implements HasDebugWindow {
                 return result;
             } catch(InterruptedException ignored) {
                 System.out.print(".");
-                return original;
+                return null;
             }
         } catch(Exception e) {
             e.printStackTrace();
@@ -92,7 +105,7 @@ public class Boof8Processor extends ImageProcessor implements HasDebugWindow {
     }
 
     public interface Function extends HasProcessorParams {
-        /** Process a color plane of the image. Put the result into pre-allocated <tt>out</tt>. */
-        void apply(ImageUInt8 in, ImageUInt8 out, int index);
+        /** Process a color plane of the images. Put the result into pre-allocated <tt>out</tt>. */
+        void apply(Collection<ImageUInt8> inputs, ImageUInt8 output, int index);
     }
 }

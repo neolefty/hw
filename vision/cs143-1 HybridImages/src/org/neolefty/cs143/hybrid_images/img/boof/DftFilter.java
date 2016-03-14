@@ -21,7 +21,7 @@ import java.util.Collection;
 
 /** Filter an image in the frequency domain, using a DFT.
  *  Most efficient if x & y are powers of 2, but not essential. */
-public class DftFilter implements Boof8Processor.Function, HasDebugWindow {
+public class DftFilter extends SingleInputBoof8Function implements HasDebugWindow {
     private Image32Generator filterGenerator;
     private ReadOnlyObjectWrapper<JComponent> debugPanelProperty = new ReadOnlyObjectWrapper<>();
 

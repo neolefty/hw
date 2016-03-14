@@ -4,6 +4,7 @@ import org.neolefty.cs143.hybrid_images.img.ImageProcessor;
 import org.neolefty.cs143.hybrid_images.util.Stopwatch;
 
 import java.awt.image.BufferedImage;
+import java.util.Collection;
 
 /** Process one pixel at a time, using image pixel accessor methods. */
 public abstract class SlowPixelProcessor extends ImageProcessor {
@@ -11,6 +12,7 @@ public abstract class SlowPixelProcessor extends ImageProcessor {
 
     public SlowPixelProcessor(IntToIntFunction pixelFunction) {
         this.pixelFunction = pixelFunction;
+        addInput();
     }
 
     public IntToIntFunction getPixelFunction() {
@@ -23,7 +25,13 @@ public abstract class SlowPixelProcessor extends ImageProcessor {
     }
 
     @Override
-    public BufferedImage process(BufferedImage original) {
+    public BufferedImage process(Collection<BufferedImage> originals) {
+        checkImageCount(originals.size(), 1, 1);
+        BufferedImage original = originals.iterator().next();
+        return processSingle(original);
+    }
+
+    public BufferedImage processSingle(BufferedImage original) {
         if (original == null)
             return null;
         else {
@@ -40,25 +48,4 @@ public abstract class SlowPixelProcessor extends ImageProcessor {
             return result;
         }
     }
-
-    // This made it take a few minutes instead of a second for a large photo
-//    @Override
-//    public BufferedImage process(BufferedImage original) {
-//        long start = System.currentTimeMillis();
-//        System.out.print("rotating");
-//        int w = original.getWidth(), h = original.getHeight();
-//        BufferedImage result = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
-//        int[] from = new int[w], to = new int[w];
-//        for (int y = 0; y < h; ++y) {
-//            original.getRGB(0, y, w, 1, from, 0, w);
-//            for (int x = 0; x < w; ++x) {
-//                int p = from[x];
-//                to[x] = ((p & 0xffff) << 8) + ((p & 0xff0000) >> 16);
-//                result.setRGB(0, y, w, 1, to, 0, w);
-//            }
-//            System.out.print(".");
-//        }
-//        System.out.println((System.currentTimeMillis() - start) + " ms");
-//        return result;
-//    }
 }

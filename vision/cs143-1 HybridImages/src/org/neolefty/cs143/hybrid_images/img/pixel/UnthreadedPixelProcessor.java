@@ -15,7 +15,7 @@ public class UnthreadedPixelProcessor extends SlowPixelProcessor {
     }
 
     @Override
-    public BufferedImage process(BufferedImage original) {
+    public BufferedImage processSingle(BufferedImage original) {
         if (original == null)
             return null;
         else {
@@ -28,28 +28,20 @@ public class UnthreadedPixelProcessor extends SlowPixelProcessor {
             copyOrig.getGraphics().drawImage(original, 0, 0, null);
             watch.mark("copy");
 
-//            DataBufferByte inBuf = (DataBufferByte) original.getRaster().getDataBuffer();
             DataBufferInt inBuf = (DataBufferInt) copyOrig.getRaster().getDataBuffer();
-//            watch.mark("input buffer"); // always 0
             int[] in = inBuf.getData();
-//            watch.mark("input array"); // always 0
 
             // output buffer
             BufferedImage result = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
             DataBufferInt outBuf = (DataBufferInt) result.getRaster().getDataBuffer();
             watch.mark("create tmp");
             int[] out = outBuf.getData();
-//            watch.mark("output array"); // always 0
 
             // do the processing
             for (int i = 0; i < in.length; ++i)
                 out[i] = getPixelFunction().apply(in[i]);
             watch.mark("process");
             copyOrig.flush();
-
-//            for (int y = 0; y < original.getHeight(); ++y)
-//                for (int x = 0; x < original.getWidth(); ++x)
-//                    result.setRGB(x, y, process(original.getRGB(x, y)));
 
             BufferedImage accel = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
             accel.getGraphics().drawImage(result, 0, 0, null);

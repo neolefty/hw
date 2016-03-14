@@ -21,6 +21,7 @@ import org.neolefty.cs143.hybrid_images.util.ImageIOKit;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.Collections;
 
 public class SliderMain extends Application {
 
@@ -51,7 +52,7 @@ public class SliderMain extends Application {
                             + "\\20081026_girls on green chair_03.JPG"));
             ImageShrinker shrink = new ImageShrinker();
             shrink.setSize(512);
-            bi = shrink.process(bi);
+            bi = shrink.process(Collections.singleton(bi));
             image = SwingFXUtils.toFXImage(bi, null);
         } catch (IOException e) {
             e.printStackTrace();
