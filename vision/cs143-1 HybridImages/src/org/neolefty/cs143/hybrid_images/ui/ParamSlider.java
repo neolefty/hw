@@ -13,12 +13,16 @@ public class ParamSlider extends Slider {
 
     public ParamSlider(ProcessorParam param) {
         super();
-        double max = param.getMax(), min = param.getMin(), range = max - min;
-        setMax(max);
-        setMin(min);
+        this.param = param;
+
+        setMax(param.getMax());
+        setMin(param.getMin());
         setValue(param.getDefault());
         setShowTickMarks(true);
         setShowTickLabels(true);
+
+        Tooltip.install(this, new Tooltip(param.getName()));
+
         if (param.isInteger()) {
             setBlockIncrement(1);
             setMajorTickUnit(1);
@@ -26,35 +30,33 @@ public class ParamSlider extends Slider {
             setSnapToTicks(true);
         }
         else {
-            setBlockIncrement(range / 20);
-            setMajorTickUnit(range / 5);
-            setMinorTickCount(4);
+            setBlockIncrement(getRange() / 10);
+            setMajorTickUnit(getRange() / 10);
+            setMinorTickCount(10);
             setSnapToTicks(false);
         }
-        setBlockIncrement(param.isInteger() ? 1 : range / 20);
-        this.param = param;
-        Tooltip.install(this, new Tooltip(param.getName()));
 
-        sliderListener = (observable, oldValue, newValue) -> {
-            synchronized (sync) {
-                param.removeListener(paramListener);  // avoid event loop
-                param.setValue(bound(newValue.doubleValue()));
-                param.addListener(paramListener);
-            }
-        };
-        paramListener = (observable, oldValue, newValue) -> {
-            synchronized (sync) {
-                valueProperty().removeListener(sliderListener); // avoid event loop
-                valueProperty().setValue(bound(newValue.doubleValue()));
-                valueProperty().addListener(sliderListener);
-            }
-        };
-        valueProperty().addListener(sliderListener);
-        param.addListener(paramListener);
+//        sliderListener = (observable, oldValue, newValue) -> {
+//            synchronized (sync) {
+//                param.removeListener(paramListener);  // avoid event loop
+//                param.setValue(bound(newValue.doubleValue()));
+//                param.addListener(paramListener);
+//            }
+//        };
+//        paramListener = (observable, oldValue, newValue) -> {
+//            synchronized (sync) {
+//                valueProperty().removeListener(sliderListener); // avoid event loop
+//                valueProperty().setValue(bound(newValue.doubleValue()));
+//                valueProperty().addListener(sliderListener);
+//            }
+//        };
+//        valueProperty().addListener(sliderListener);
+//        param.addListener(paramListener);
 
-//        valueProperty().bindBidirectional(param);
-
+        valueProperty().bindBidirectional(param);
     }
+
+    public double getRange() { return getMax() - getMin(); }
 
     private double bound(double x) {
         x = Math.min(param.getMax(), x);

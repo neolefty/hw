@@ -9,13 +9,15 @@ import java.util.List;
 
 /** A simple dimmer. */
 public class Dimmer implements IntToIntFunction, HasProcessorParams {
-    private ProcessorParam brightParam = new ProcessorParam("bright", 1, 0, 4, "Dimmer's brightness.");
+    private ProcessorParam brightParam = new ProcessorParam("bright", 1, -5, 5, "Dimmer's brightness.");
     private List<ProcessorParam> params = Collections.singletonList(brightParam);
     private int bright = 127; // 0 to 255
+    private boolean negative = false;
 
     public Dimmer() {
         brightParam.addListener((observable, oldValue, newValue) -> {
-            bright = (int) (newValue.doubleValue() * 255);
+            bright = Math.abs((int) (newValue.doubleValue() * 255));
+            negative = newValue.doubleValue() < 0;
         });
     }
 
@@ -28,7 +30,9 @@ public class Dimmer implements IntToIntFunction, HasProcessorParams {
     }
 
     private int applyChannel(int x) {
-        return Math.max(0, Math.min(255, x * bright / 255));
+        int y = x * bright / 255;
+        if (negative) y = bright - y;
+        return Math.max(0, Math.min(255, y));
     }
 
     @Override public Collection<ProcessorParam> getProcessorParams() { return params; }
