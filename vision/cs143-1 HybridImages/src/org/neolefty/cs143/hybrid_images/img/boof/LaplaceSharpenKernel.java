@@ -17,9 +17,19 @@ public class LaplaceSharpenKernel extends HasProcessorParamsBase implements Kern
     public Kernel2D_F32 createKernel(int diameter) {
         int r = diameter / 2 + 1;
         Kernel2D_F32 result = new Kernel2D_F32(diameter);
+        double sum = 0, min = 10, max = -10;
         for (int y = 0; y < diameter; ++y)
-            for (int x = 0; x < diameter; ++x)
-                result.set(x, y, (float) laplaceOfGaussian(x-r, y-r, sigma.doubleValue()));
+            for (int x = 0; x < diameter; ++x) {
+                double z = laplaceOfGaussian(x - r, y - r, sigma.doubleValue());
+                result.set(x, y, (float) z);
+                sum += z;
+                min = Math.min(min, z);
+                max = Math.max(max, z);
+            }
+//        double average = sum / (diameter * diameter);
+//        System.out.println("Laplacian of Gaussian (d=" + diameter + ", s="
+//                + sigma.doubleValue() + ") Sum = " + sum + ", Avg = " + average
+//                + ", min = " + min + ", max = " + max);
         return result;
     }
 
