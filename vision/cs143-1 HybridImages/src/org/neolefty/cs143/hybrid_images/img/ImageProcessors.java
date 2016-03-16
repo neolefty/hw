@@ -19,18 +19,17 @@ public class ImageProcessors {
                 new PixelProcessor(new InvertBlue(), x),
                 new ImagePassThrough(),
                 // fft mag & phase
-                new Boof8Processor(new FftUInt8(FftUInt8.Part.magnitude), x),
-                new Boof8Processor(new FftUInt8(FftUInt8.Part.phase), x),
+                new Boof8Processor(new Dft32(Dft32.Part.magnitude), x),
+                new Boof8Processor(new Dft32(Dft32.Part.phase), x),
                 // gaussian blur
                 new Boof8Processor(new GaussBlur8(), x),
                 // simple frequency filter
                 boof8(new SimpleFilterGenerator(), x),
-                new Boof8Processor(new DftFilter32(new SimpleFilterGenerator()), x),
                 // butterworth filter
                 boof8(new ButterworthGenerator(), x));
     }
 
     private static ImageProcessor boof8(FilterGenerator gen, ExecutorService threadPool) {
-        return new Boof8Processor(new DftFilter(gen), threadPool);
+        return new Boof8Processor(new DftFilter32(gen), threadPool);
     }
 }

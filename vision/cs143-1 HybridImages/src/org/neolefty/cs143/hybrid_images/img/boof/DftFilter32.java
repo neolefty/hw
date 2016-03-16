@@ -7,15 +7,17 @@ import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.InterleavedF32;
 import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.ReadOnlyObjectWrapper;
-import org.neolefty.cs143.hybrid_images.img.ImageProcessor;
 import org.neolefty.cs143.hybrid_images.ui.HasDebugWindow;
 import org.neolefty.cs143.hybrid_images.ui.ProcessorParam;
 
 import javax.swing.*;
 import java.util.Collection;
 
+import static org.neolefty.cs143.hybrid_images.ui.util.DebugVizKit.viz;
+import static org.neolefty.cs143.hybrid_images.ui.util.DebugVizKit.vizMag;
+
 /** Filter an image in the frequency domain, using a DFT. */
-public class DftFilter32 extends Boof32Function implements HasDebugWindow {
+public class DftFilter32 extends SingleInputBoof32Function implements HasDebugWindow {
     private Image32Generator filterGenerator;
     private ReadOnlyObjectWrapper<JComponent> debugPanelProperty = new ReadOnlyObjectWrapper<>();
 
@@ -23,13 +25,9 @@ public class DftFilter32 extends Boof32Function implements HasDebugWindow {
     public DftFilter32(Image32Generator filterGenerator) { this.filterGenerator = filterGenerator; }
 
     @Override
-    public void apply(Collection<ImageFloat32> inputs, ImageFloat32 output, int index) {
-        // look at inputs
-        ImageProcessor.checkImageCount(inputs.size(), 1, 1);
-        ImageFloat32 input = inputs.iterator().next();
-        int w = input.getWidth(), h = input.getHeight();
-
+    public void apply(ImageFloat32 input, ImageFloat32 output, int index) {
         // perform the DFT
+        int w = input.getWidth(), h = input.getHeight();
         DiscreteFourierTransform<ImageFloat32, InterleavedF32> dft = DiscreteFourierTransformOps.createTransformF32();
         InterleavedF32 fftInput = new InterleavedF32(w, h, 2);
         dft.forward(input, fftInput);
@@ -50,8 +48,8 @@ public class DftFilter32 extends Boof32Function implements HasDebugWindow {
             ImageFloat32 reconstruct = new ImageFloat32(w, h);
             dft.inverse(fftInput, reconstruct);
             debugPanelProperty.setValue(new ImageGridPanel(2, 3,
-                    DftFilter.viz(input, 1), DftFilter.vizMag(fftInput), DftFilter.viz(reconstruct),
-                    DftFilter.viz(filter, 1), DftFilter.vizMag(fftOutput), DftFilter.viz(output)
+                    viz(input, 1), vizMag(fftInput), viz(reconstruct),
+                    viz(filter, 1), vizMag(fftOutput), viz(output)
             ) {
                 @Override public String toString() {
                     return filterGenerator + " - original / filter - fft / multiplied - reconstructed / result";
@@ -70,5 +68,5 @@ public class DftFilter32 extends Boof32Function implements HasDebugWindow {
         return filterGenerator.getProcessorParams();
     }
 
-    @Override public String toString() { return filterGenerator.toString() + "32"; }
+    @Override public String toString() { return filterGenerator.toString(); }
 }
