@@ -92,10 +92,10 @@ public class DftFilter extends SingleInputBoof8Function implements HasDebugWindo
         return debugPanelProperty.getReadOnlyProperty();
     }
 
-    private BufferedImage viz(ImageFloat32 image32) {
+    public static BufferedImage viz(ImageFloat32 image32) {
         return viz(image32, -1);
     }
-    private BufferedImage viz(ImageFloat32 image32, double normalize) {
+    public static BufferedImage viz(ImageFloat32 image32, double normalize) {
         return VisualizeImageData.grayMagnitude(image32, null, normalize);
     }
 

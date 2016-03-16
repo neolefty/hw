@@ -11,7 +11,7 @@ import java.util.List;
 
 /** A Gaussian blur. */
 public class GaussBlur8 extends SingleInputBoof8Function {
-    private ProcessorParam radius = new ProcessorParam("radius", 0.01, 0, 0.25,
+    private ProcessorParam radius = new ProcessorParam("radius", 0.01, 0, 0.2,
             "Radius of the blur as a proportion of the image.");
     private List<ProcessorParam> params = Collections.singletonList(radius);
 

@@ -52,6 +52,8 @@ public abstract class FilterGenerator implements Image32Generator {
         // In the extreme case, if the circle completely covers the image,
         // the result will be an all-pass filter.
         double f = Math.abs(fraction.doubleValue());
+        // then square it, to improve dynamic range
+        f *= f;
         return Math.sqrt(f * w * h / Math.PI);
     }
 

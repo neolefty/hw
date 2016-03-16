@@ -9,7 +9,9 @@ import java.util.concurrent.ExecutorService;
 
 /** Create a list of image processors. */
 public class ImageProcessors {
-    public static List<ImageProcessor> getList(ExecutorService x) {
+    /** All the useful single-image processors.
+     *  Creates a new set of objects each time, to isolate parameters. */
+    public static List<ImageProcessor> getSingleImageProcessors(ExecutorService x) {
         return Arrays.asList(
                 // pixel-by-pixel
                 new PixelProcessor(new Dimmer(), x),
@@ -23,6 +25,7 @@ public class ImageProcessors {
                 new Boof8Processor(new GaussBlur8(), x),
                 // simple frequency filter
                 boof8(new SimpleFilterGenerator(), x),
+                new Boof8Processor(new DftFilter32(new SimpleFilterGenerator()), x),
                 // butterworth filter
                 boof8(new ButterworthGenerator(), x));
     }

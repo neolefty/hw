@@ -101,7 +101,7 @@ public class Main extends Application {
     {
         return new ChooseProcessorView(
                 getPref("filter").createChild(prefsSuffix),
-                ImageProcessors.getList(lowThreads),
+                ImageProcessors.getSingleImageProcessors(lowThreads),
                 Collections.singleton(source.imageProperty()),
                 highExec);
     }
