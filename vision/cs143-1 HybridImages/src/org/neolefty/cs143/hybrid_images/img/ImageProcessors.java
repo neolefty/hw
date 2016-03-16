@@ -19,17 +19,24 @@ public class ImageProcessors {
                 new PixelProcessor(new InvertBlue(), x),
                 new ImagePassThrough(),
                 // fft mag & phase
-                new Boof8Processor(new Dft32(Dft32.Part.magnitude), x),
-                new Boof8Processor(new Dft32(Dft32.Part.phase), x),
-                // gaussian blur
-                new Boof8Processor(new GaussBlur8(), x),
+                new BoofProcessor(new DftVisualize(DftVisualize.Part.magnitude), x),
+                new BoofProcessor(new DftVisualize(DftVisualize.Part.phase), x),
+                // Laplacian sharpen
+                kernel(new LaplaceSharpenKernel(), x),
+                kernel(new RandomKernel(), x),
+                // Gaussian blur
+                new BoofProcessor(new GaussBlur8(), x),
                 // simple frequency filter
                 boof8(new SimpleFilterGenerator(), x),
                 // butterworth filter
                 boof8(new ButterworthGenerator(), x));
     }
 
+    private static ImageProcessor kernel(KernelGenerator kernelGenerator, ExecutorService threadPool) {
+        return new BoofProcessor(new ConvolutionFunction32(kernelGenerator), threadPool);
+    }
+
     private static ImageProcessor boof8(FilterGenerator gen, ExecutorService threadPool) {
-        return new Boof8Processor(new DftFilter32(gen), threadPool);
+        return new BoofProcessor(new DftFilter(gen), threadPool);
     }
 }

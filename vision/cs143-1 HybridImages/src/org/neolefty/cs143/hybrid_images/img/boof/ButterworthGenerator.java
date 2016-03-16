@@ -6,11 +6,10 @@ import org.neolefty.cs143.hybrid_images.ui.ProcessorParam;
 /** Generates Butterworth filters. */
 public class ButterworthGenerator extends FilterGenerator {
     private ProcessorParam order
-            = new ProcessorParam("order", 1, 1, 12, "What order of Butterworth filter?");
+            = new ProcessorParam("order", 1, 1, 12, true, "What order of Butterworth filter?");
 
     /** Create a Butterworth filter generator. */
     public ButterworthGenerator() {
-        order.setInteger(true);
         super.addParam(order);
     }
 

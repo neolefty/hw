@@ -20,12 +20,12 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 
 /** Convert to BoofCV MultiSpectral ImageUInt8 and do something. Uses ThreadPool to process RGB bands separately. */
-public class Boof8Processor extends ImageProcessor implements HasDebugWindow {
+public class BoofProcessor extends ImageProcessor implements HasDebugWindow {
     private final ExecutorService exec;
     private Function function;
     private ReadOnlyObjectWrapper<JComponent> debugWindowProperty = new ReadOnlyObjectWrapper<>();
 
-    public Boof8Processor(Function function, ExecutorService exec) {
+    public BoofProcessor(Function function, ExecutorService exec) {
         this.function = function;
         if (function != null && function instanceof HasDebugWindow)
             debugWindowProperty.bind(((HasDebugWindow) function).debugWindowProperty());

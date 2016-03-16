@@ -6,7 +6,7 @@ import org.neolefty.cs143.hybrid_images.img.ImageProcessor;
 import java.util.Collection;
 
 /** Convenience class for implementing single-input functions. */
-public abstract class SingleInputBoof8Function implements Boof8Processor.Function {
+public abstract class SingleInputBoof8Function implements BoofProcessor.Function {
     @Override
     public void apply(Collection<ImageUInt8> inputs, ImageUInt8 output, int index) {
         ImageProcessor.checkImageCount(inputs.size(), 1, 1);

@@ -12,14 +12,14 @@ import java.util.Collection;
 import java.util.Collections;
 
 /** Discrete Fourier Transform of an image, for visualization. Can show either the magnitude or phase. */
-public class Dft32 extends SingleInputBoof32Function {
+public class DftVisualize extends SingleInputBoof32Function {
     private ProcessorParam logGain = new ProcessorParam("log gain", -3, -5, 0, "Log of fft magnitude gain.");
 
     public enum Part { magnitude, phase }
 
     private Part part;
 
-    public Dft32(Part part) {
+    public DftVisualize(Part part) {
         this.part = part;
     }
 

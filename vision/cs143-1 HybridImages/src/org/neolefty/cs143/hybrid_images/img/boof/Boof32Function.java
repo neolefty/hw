@@ -10,7 +10,7 @@ import java.util.Collection;
 import java.util.List;
 
 /** A function that operates on 32-bit floats, normalized to 0-1. */
-public abstract class Boof32Function implements Boof8Processor.Function {
+public abstract class Boof32Function extends HasProcessorParamsBase implements BoofProcessor.Function {
     @Override
     public void apply(Collection<ImageUInt8> originals, ImageUInt8 output, int index) {
         // convert to float

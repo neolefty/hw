@@ -17,12 +17,12 @@ import static org.neolefty.cs143.hybrid_images.ui.util.DebugVizKit.viz;
 import static org.neolefty.cs143.hybrid_images.ui.util.DebugVizKit.vizMag;
 
 /** Filter an image in the frequency domain, using a DFT. */
-public class DftFilter32 extends SingleInputBoof32Function implements HasDebugWindow {
+public class DftFilter extends SingleInputBoof32Function implements HasDebugWindow {
     private Image32Generator filterGenerator;
     private ReadOnlyObjectWrapper<JComponent> debugPanelProperty = new ReadOnlyObjectWrapper<>();
 
     /** Construct a new filter using a filter generator. */
-    public DftFilter32(Image32Generator filterGenerator) { this.filterGenerator = filterGenerator; }
+    public DftFilter(Image32Generator filterGenerator) { this.filterGenerator = filterGenerator; }
 
     @Override
     public void apply(ImageFloat32 input, ImageFloat32 output, int index) {

@@ -8,6 +8,7 @@ import javafx.scene.control.Tooltip;
 public class ParamSlider extends Slider {
     private ProcessorParam param;
     private static final Object sync = new Object();
+    private Tooltip tip;
 
     private ChangeListener<? super Number> sliderListener, paramListener;
 
@@ -21,7 +22,11 @@ public class ParamSlider extends Slider {
         setShowTickMarks(true);
         setShowTickLabels(true);
 
-        Tooltip.install(this, new Tooltip(param.getName()));
+        // show name & current value in tooltip
+        tip = new Tooltip(param.getName());
+        Tooltip.install(this, tip);
+        valueProperty().addListener((observable, oldValue, newValue)
+                -> tip.setText(param.getName() + " = " + valueProperty().get()));
 
         if (param.isInteger()) {
             setBlockIncrement(1);

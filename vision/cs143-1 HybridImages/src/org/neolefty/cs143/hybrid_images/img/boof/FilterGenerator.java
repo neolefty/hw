@@ -2,13 +2,8 @@ package org.neolefty.cs143.hybrid_images.img.boof;
 
 import org.neolefty.cs143.hybrid_images.ui.ProcessorParam;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-
 /** Base class for low- and high-pass filter generators. */
-public abstract class FilterGenerator implements Image32Generator {
+public abstract class FilterGenerator extends HasProcessorParamsBase implements Image32Generator {
     public enum Type {
         lowPass, highPass
     }
@@ -18,12 +13,8 @@ public abstract class FilterGenerator implements Image32Generator {
             ("fraction", 0.2, -1, 1,
                     "How strong is the filter? Negative for high-pass, positive for low-pass.");
 
-    private List<ProcessorParam> params = Collections.singletonList(fraction);
-
-    protected void addParam(ProcessorParam param) {
-        List<ProcessorParam> tmp = new ArrayList<>(params);
-        tmp.add(param);
-        params = Collections.unmodifiableList(tmp);
+    public FilterGenerator() {
+        addParam(fraction);
     }
 
     /** The fraction of area in the circle in the center of the FFT.
@@ -36,8 +27,6 @@ public abstract class FilterGenerator implements Image32Generator {
     public Type getFilterType() {
         return fraction.doubleValue() <= 0 ? Type.highPass : Type.lowPass;
     }
-
-    @Override public Collection<ProcessorParam> getProcessorParams() { return params; }
 
     /** Compute the radius of this filter for a given FFT size, based on this filter's {@link #getFraction}. */
     public double computeRadius(int w, int h) {
