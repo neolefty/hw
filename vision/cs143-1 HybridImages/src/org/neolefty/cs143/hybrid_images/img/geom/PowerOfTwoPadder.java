@@ -17,7 +17,7 @@ public class PowerOfTwoPadder extends ImageProcessor {
         checkImageCount(originals.size(), 1, 1);
         Stopwatch watch = new Stopwatch();
         BufferedImage original = originals.iterator().next();
-        BufferedImage result = PowerOfTwo.pad(original, square);
+        BufferedImage result = ImagePadKit.padPowerOfTwo(original, square);
         System.out.println("Pad " + original.getWidth() + "x" + original.getHeight()
                 + " to " + result.getWidth() + "x" + result.getHeight() + ": " + watch);
         return result;

@@ -46,11 +46,15 @@ public class PixelProcessor extends UnthreadedPixelProcessor {
                 final int a = i * chunk, b = (i == nPieces - 1 ? work.length : a + chunk);
                 final int finalI = i;
                 exec.execute(() -> {
-                    for (int j = a; j < b; ++j)
-                        work[j] = getPixelFunction().apply(work[j]);
-                    if (latch.getCount() == nPieces)
-                        watch.mark("first=" + finalI);
-                    latch.countDown();
+                    try {
+                        for (int j = a; j < b; ++j)
+                            work[j] = getPixelFunction().apply(work[j]);
+                        if (latch.getCount() == nPieces)
+                            watch.mark("first=" + finalI);
+                    }
+                    finally {
+                        latch.countDown();
+                    }
                 });
             }
             try {

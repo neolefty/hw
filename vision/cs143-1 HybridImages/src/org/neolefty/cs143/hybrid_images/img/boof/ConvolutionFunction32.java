@@ -29,8 +29,7 @@ public class ConvolutionFunction32 extends SingleInputBoof32Function implements 
 
     public ConvolutionFunction32(KernelGenerator kernelGenerator) {
         addParam(radius);
-        if (kernelGenerator instanceof HasProcessorParams)
-            addParams((HasProcessorParams) kernelGenerator);
+        addIfHasParams(kernelGenerator);
         this.kernelGenerator = kernelGenerator;
     }
 

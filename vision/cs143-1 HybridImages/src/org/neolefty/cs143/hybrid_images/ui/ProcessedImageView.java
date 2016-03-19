@@ -38,6 +38,10 @@ public class ProcessedImageView extends StackImageView {
     {
         this.exec = exec;
         this.sources = sources;
+
+        // parameters changed: reprocess inputs
+        paramListener = (observable, oldValue, newValue) -> reprocess();
+
         Tooltip.install(this, tip);
 
         // whenever the processor is changed ...
@@ -62,9 +66,6 @@ public class ProcessedImageView extends StackImageView {
             source.addListener((observable, oldValue, newValue) -> {
                 reprocess();
             });
-
-        // parameters changed: reprocess inputs
-        paramListener = (observable, oldValue, newValue) -> reprocess();
 
         // controls for processor parameters -- at top
         ProcessorControlView controlView = new ProcessorControlView

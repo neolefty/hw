@@ -2,6 +2,8 @@ package org.neolefty.cs143.hybrid_images.img;
 
 import org.neolefty.cs143.hybrid_images.img.boof.*;
 import org.neolefty.cs143.hybrid_images.img.pixel.*;
+import org.neolefty.cs143.hybrid_images.img.two.AddTwoWeighted;
+import org.neolefty.cs143.hybrid_images.img.two.ImagePairPixelProcessor;
 
 import java.util.Arrays;
 import java.util.List;
@@ -30,6 +32,12 @@ public class ImageProcessors {
                 boof8(new SimpleFilterGenerator(), x),
                 // butterworth filter
                 boof8(new ButterworthGenerator(), x));
+    }
+
+    public static List<ImageProcessor> getTwoImageProcessors(ExecutorService x) {
+        return Arrays.asList(
+                new ImagePairPixelProcessor(new AddTwoWeighted(), x)
+        );
     }
 
     private static ImageProcessor kernel(KernelGenerator kernelGenerator, ExecutorService threadPool) {

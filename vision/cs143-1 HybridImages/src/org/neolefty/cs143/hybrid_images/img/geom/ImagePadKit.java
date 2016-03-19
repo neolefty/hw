@@ -9,7 +9,7 @@ import java.util.Collections;
 import java.util.List;
 
 /** Adjust images to have dimensions that are powers of 2. */
-public class PowerOfTwo {
+public class ImagePadKit {
     public static final List<Integer> POWERS_OF_TWO;
     static {
         List<Integer> pot = new ArrayList<>();
@@ -20,22 +20,31 @@ public class PowerOfTwo {
 
     /** Pad <tt>in</tt> to have dimensions that are a power of two, with a grey border.
      *  No effect if its dimensions are already powers of 2. */
-    public static BufferedImage pad(BufferedImage in, boolean square) {
-        int win = in.getWidth(), hin = in.getHeight();
-        int wout = nextPowerOf2(win), hout = nextPowerOf2(hin);
+    public static BufferedImage padPowerOfTwo(BufferedImage in, boolean square) {
+        int wIn = in.getWidth(), hIn = in.getHeight();
+        int wOut = nextPowerOf2(wIn), hOut = nextPowerOf2(hIn);
         if (square) {
-            wout = Math.max(hout, wout);
-            hout = wout;
+            wOut = Math.max(hOut, wOut);
+            hOut = wOut;
         }
-        if (win == wout && hin == hout)
-            return in;
+        return pad(in, wOut, hOut, false);
+    }
+
+    /** Pad <tt>in</tt> to be w x h.
+     *  @param force if true, make a new copy, using 32-bit ARGB pixels,
+     *               even if no size change is necessary. */
+    public static BufferedImage pad(BufferedImage orig, int w, int h, boolean force) {
+        int wOrig = orig.getWidth(), hOrig = orig.getHeight();
+        // only shortcut if the size won't change & we're being asked to.
+        if (!force && wOrig == w && hOrig == h)
+            return orig;
         else {
-            BufferedImage result = new BufferedImage(wout, hout, BufferedImage.TYPE_INT_ARGB);
+            BufferedImage result = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
             Graphics g = result.getGraphics();
             g.setColor(new Color(127, 127, 127));
-            g.fillRect(0, 0, wout, hout);
-            int wd = (wout - win) / 2, hd = (hout - hin) / 2;
-            g.drawImage(in, wd, hd, null);
+            g.fillRect(0, 0, w, h);
+            int wd = (w - wOrig) / 2, hd = (h - hOrig) / 2;
+            g.drawImage(orig, wd, hd, null);
             return result;
         }
     }

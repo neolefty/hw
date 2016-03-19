@@ -12,22 +12,27 @@ import java.util.List;
 public class HasProcessorParamsBase implements HasProcessorParams {
     private List<ProcessorParam> params = Collections.emptyList();
 
-    protected void addParam(ProcessorParam param) {
+    public void addParam(ProcessorParam param) {
         addParams(Collections.singleton(param));
     }
 
-    protected void addParams(Collection<ProcessorParam> add) {
+    public void addParams(Collection<ProcessorParam> add) {
         List<ProcessorParam> tmp = new ArrayList<>(params);
         tmp.addAll(add);
         params = Collections.unmodifiableList(tmp);
     }
 
-    protected void addParams(HasProcessorParams source) {
+    public void addParams(HasProcessorParams source) {
         addParams(source.getProcessorParams());
     }
 
     @Override
     public Collection<ProcessorParam> getProcessorParams() {
         return params;
+    }
+
+    public void addIfHasParams(Object function) {
+        if (function instanceof HasProcessorParams)
+            addParams((HasProcessorParams) function);
     }
 }

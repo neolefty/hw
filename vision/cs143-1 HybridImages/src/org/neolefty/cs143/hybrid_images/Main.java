@@ -1,20 +1,28 @@
 package org.neolefty.cs143.hybrid_images;
 
 import javafx.application.Application;
+import javafx.beans.property.ObjectProperty;
 import javafx.scene.Node;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 import org.neolefty.cs143.hybrid_images.img.ImageProcessors;
 import org.neolefty.cs143.hybrid_images.img.geom.ImageShrinker;
+import org.neolefty.cs143.hybrid_images.img.two.AddTwoWeighted;
+import org.neolefty.cs143.hybrid_images.img.two.ImagePairPixelProcessor;
+import org.neolefty.cs143.hybrid_images.img.two.TwoIntegerRGBSplitter;
 import org.neolefty.cs143.hybrid_images.ui.ChooseFileImageView;
 import org.neolefty.cs143.hybrid_images.ui.ChooseProcessorView;
 import org.neolefty.cs143.hybrid_images.ui.HasBufferedImageProperty;
+import org.neolefty.cs143.hybrid_images.ui.ProcessedImageView;
 import org.neolefty.cs143.hybrid_images.ui.util.PersistentScene;
 import org.neolefty.cs143.hybrid_images.ui.util.PrefStuff;
+import org.neolefty.cs143.hybrid_images.ui.util.ProcessedBI;
 import org.neolefty.cs143.hybrid_images.ui.util.StrictGrid;
 import org.neolefty.cs143.hybrid_images.util.CancellingExecutor;
 
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -77,11 +85,21 @@ public class Main extends Application {
         ChooseProcessorView filterRight2b = createFilterChooser(filterRight2a, "right 2b");
         ChooseProcessorView filterRight2c = createFilterChooser(filterRight2b, "right 2c");
 
+        List<ObjectProperty<ProcessedBI>>
+                sumLeftSources = Arrays.asList(filterLeft1c.imageProperty(), filterRight2c.imageProperty()),
+                sumRightSources = Arrays.asList(filterLeft2c.imageProperty(), filterRight1c.imageProperty());
+        ProcessedImageView sumLeft = new ProcessedImageView(getPref("sum").createChild("left"),
+                new ImagePairPixelProcessor(new TwoIntegerRGBSplitter(new AddTwoWeighted()), lowThreads),
+                sumLeftSources, highExec);
+        ProcessedImageView sumRight = new ProcessedImageView(getPref("sum").createChild("right"),
+                new ImagePairPixelProcessor(new TwoIntegerRGBSplitter(new AddTwoWeighted()), lowThreads),
+                sumRightSources, highExec);
+
         GridPane outer = new StrictGrid();
         outer.setGridLinesVisible(true);
 
         addToGrid(outer, 4, 4,
-                left, null, null, right,
+                left, sumLeft, sumRight, right,
                 filterLeft1a, filterLeft2a, filterRight2a, filterRight1a,
                 filterLeft1b, filterLeft2b, filterRight2b, filterRight1b,
                 filterLeft1c, filterLeft2c, filterRight2c, filterRight1c);

@@ -67,8 +67,10 @@ public class ProcessedBI {
     @Override public String toString() { return toString(" - ", false); }
 
     public String toString(String sep, boolean shorten) {
-        String procName = processor == null ? "" : processor.toString() + sep;
-        String filename = (file == null ? "" : file.getName() + sep);
+        String procName = processor == null ? "" : processor.toString();
+        String filename = (file == null ? "" : file.getName());
+        String before = procName + (procName.length() == 0 ? "" : sep) + filename;
+        boolean print = false;
         if (shorten) {
             // remove suffix -- doesn't add meaning
             if (filename.lastIndexOf(".") > 0)
@@ -77,11 +79,14 @@ public class ProcessedBI {
                 filename = filename.substring(filename.indexOf(".") + 1);
             // last 12 or fewer characters
             if (filename.length() > 12)
-                filename = filename.substring(filename.length() - 12);
-            if (procName.length() > 8 + sep.length())
-                procName = procName.substring(0, 8) + sep;
+                // first & last 5 letters "abcde..vwxyz"
+                filename = filename.substring(0, 5) + "__" + filename.substring(filename.length() - 5);
+            if (procName.length() > 8)
+                procName = procName.substring(0, 8);
+//            print = true;
         }
-        String result = procName + filename;
+        String result = procName.trim() + (procName.length() == 0 ? "" : sep) + filename.trim();
+        String after = result;
 
         // describe predecessors as an array
         if (predecessors != null && predecessors.size() > 0) {
@@ -96,9 +101,12 @@ public class ProcessedBI {
             }
         }
 
-        // remove extra separators from the end
         while (result.endsWith(sep))
             result = result.substring(0, result.length() - sep.length());
+
+        if (print)
+            System.out.println("Before: \"" + before + "\"; After: \"" + after + "\"; Final: \"" + result + "\"");
+
         return result;
     }
 
