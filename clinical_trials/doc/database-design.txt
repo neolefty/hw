@@ -1,0 +1,26 @@
+Study
+  - title
+  - name of PI
+  - open or closed
+
+Site
+  - name
+  - location
+
+Study Sites
+  - study_id
+  - site_id
+
+Participant
+  - site_id
+  - name
+  - gender
+  - dob
+
+Participant Studies
+  - participant_id
+  - study_id
+
+Participant Contact
+  - participant_id
+  - address
