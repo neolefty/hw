@@ -1,0 +1,1 @@
+# Based on [reactfire quickstart](https://github.com/FirebaseExtended/reactfire/blob/master/docs/quickstart.md)
