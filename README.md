@@ -8,3 +8,5 @@ Problems from courses and textbooks
 Here's a video explaining debugging a thread problem:
 
 [![Video explanation of debugging some image processing homework](http://img.youtube.com/vi/XooXyAbpLc0/0.jpg)](https://youtu.be/XooXyAbpLc0)
+
+Plus, trying out technologies, such as [ReactFire for FireBase](https://github.com/FirebaseExtended/reactfire/blob/master/docs/quickstart.md).
