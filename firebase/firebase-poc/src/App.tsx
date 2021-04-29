@@ -15,51 +15,53 @@ if (!app) app = firebase.initializeApp({
 })
 
 export const App = () => {
-    const auth = useProviderAuth()
-    const [email, setEmail] = useState<string>('')
+    const [emailInput, setEmail] = useState<string>('')
     const [error, setError] = useState<Error>()
     const [user, setUser] = useState<firebase.User | null>(null)
     const [message, setMessage] = useState<string>()
+    const auth = useProviderAuth(setMessage)
     const url = window.location.toString()
     const isSignin = firebase.auth().isSignInWithEmailLink(url)
+
+    const handleSignIn = useCallback((email: string) => {
+        try {
+            auth.signin(email, url)
+            localStorage.removeItem('emailSent')
+        }
+        catch(e) {
+            setError(e)
+        }
+    }, [auth, url])
+
     useEffect(() => {
-        if (isSignin && !email) {
+        if (isSignin && !emailInput) {
             const storedEmail = localStorage.getItem('emailSent')
             if (typeof storedEmail === 'string')
-                setEmail(storedEmail)
+                handleSignIn(storedEmail)
         }
-    }, [email, isSignin])
+    }, [emailInput, handleSignIn, isSignin])
+
     useEffect(() => {
         firebase.auth().onAuthStateChanged(setUser)
     }, [])
-    const handleSignIn = useCallback(() => {
-        if (email) {
-            try {
-                auth.signin(email, url)
-                localStorage.removeItem('emailSent')
-            }
-            catch(e) {
-                setError(e)
-            }
-        }
-    }, [auth, email, url])
+
     return (
         <>
-            <div>Firebase POC: {app.name}</div>
-            <div>Email: <input value={email} onChange={e => setEmail(e.target.value)}/></div>
-            <div>
-                {!isSignin && <button onClick={() => email && auth.requestEmail(email)} disabled={!email}>Send Link</button>}
-                {isSignin && <button onClick={handleSignIn} disabled={!email || !!auth.user}>Sign In</button>}
-            </div>
-            {auth.sent && <div>Sent email to <strong>{auth.sent}</strong></div>}
-            {auth.user && <div>Signed in just now as <strong>{auth.user.email}</strong></div>}
+            <h2>Firebase POC: {app.name}</h2>
             {user &&
                 <div>
-                    <strong>Really</strong> signed in as {user.displayName || user.email || user.phoneNumber}
+                    Signed in as {user.displayName || user.email || user.phoneNumber}
                     {user?.photoURL && <img src={user.photoURL} alt={user.displayName || 'photo'}/>}
+                    &nbsp;—&nbsp;
                     <button onClick={() => firebase.auth().signOut().then(() => setMessage('Signed out'))}>Sign Out</button>
                 </div>
             }
+            {!user && <div>
+                Sign in via email: <input value={emailInput} onChange={e => setEmail(e.target.value)}/>
+                &nbsp;—&nbsp;
+                {!isSignin && <button onClick={() => emailInput && auth.requestEmail(emailInput)} disabled={!emailInput}>Send Link</button>}
+                {isSignin && <button onClick={() => handleSignIn(emailInput)} disabled={!emailInput}>Sign In</button>}
+            </div>}
             {message && <div style={{background: '#cfc', padding: '1em'}}>{message}</div>}
             {error && <div style={{background: '#fcc', padding: '1em'}}>{error.message}</div>}
         </>
@@ -69,22 +71,16 @@ export const App = () => {
 interface ProviderAuth {
     requestEmail: (email: string) => void
     signin: (email: string, link: string) => void
-    user: firebase.User | null
-    sent?: string
 }
 
-const useProviderAuth = (): ProviderAuth => {
-    const [user, setUser] = useState<firebase.User  | null>(null)
-    const [sent, setSent] = useState<string>()
-
+const useProviderAuth = (onMessage: (message: string) => void): ProviderAuth => {
     const signin = (email: string, link: string) => {
         if (!firebase.auth().isSignInWithEmailLink(link))
             throw new Error(`Not a signing link: ${link}`)
         firebase.auth().signInWithEmailLink(email, link).then(
             // TODO find the tutorial this came from
             // TODO consider using react-firebase-hooks — https://www.npmtrends.com/react-firebase-hooks-vs-reactfire
-            // TODO store the user for later retrieval — what's the firebase way to do that?
-            response => setUser(response.user)
+            response => onMessage(`Signed in as "${response.user?.email}".`)
         )
     }
 
@@ -98,9 +94,9 @@ const useProviderAuth = (): ProviderAuth => {
             handleCodeInApp: true,
         }).then(() => {
             localStorage.setItem('emailSent', email)
-            setSent(email)
+            onMessage(`Sent email to "${email}".`)
         })
     }
 
-    return {user, sent, signin, requestEmail}
+    return {signin, requestEmail}
 }
