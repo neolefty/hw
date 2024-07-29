@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px">
+    <!-- Thanks Google Fonts: https://fonts.google.com/icons?selected=Material+Symbols+Outlined:campaign:FILL@0;wght@400;GRAD@0;opsz@24&icon.query=megaphone&icon.size=24&icon.color=%23e8eaed -->
+    <style>
+        path {
+            fill: #000;
+        }
+        @media (prefers-color-scheme: dark) {
+            path {
+                fill: #fff;
+            }
+        }
+    </style>
+    <g transform="rotate(-25, 480, -480) scale(1)"><path d="M720-440v-80h160v80H720Zm48 280-128-96 48-64 128 96-48 64Zm-80-480-48-64 128-96 48 64-128 96ZM200-200v-160h-40q-33 0-56.5-23.5T80-440v-80q0-33 23.5-56.5T160-600h160l200-120v480L320-360h-40v160h-80Zm240-182v-196l-98 58H160v80h182l98 58Zm120 36v-268q27 24 43.5 58.5T620-480q0 41-16.5 75.5T560-346ZM300-480Z"/></g>
+</svg>
