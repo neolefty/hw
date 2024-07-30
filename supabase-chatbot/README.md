@@ -15,6 +15,10 @@ pnpm dev
 
 Open [http://localhost:3000](http://localhost:3000).
 
+## One-time Setup
+
+* Recommended: [Configure Deno CLI](https://docs.deno.com/runtime/manual/getting_started/setup_your_environment/)
+
 ## Credits
 
 talk.png from [Wikimedia](https://commons.wikimedia.org/wiki/File:Talk2.png)
